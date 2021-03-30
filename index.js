@@ -25,13 +25,14 @@ var guestbookListener = null;
 
 async function main() {
   // Add Firebase project configuration object here
-  var firebaseConfig = {
-    apiKey: "AIzaSyD3ujyL894SJ-rvOUzzkDjmDVycgOaRnfw",
-    authDomain: "fir-web-codelab-8178b.firebaseapp.com",
-    projectId: "fir-web-codelab-8178b",
-    storageBucket: "fir-web-codelab-8178b.appspot.com",
-    messagingSenderId: "287487311028",
-    appId: "1:287487311028:web:d3a7436dcbb1f1f20f2be1"
+  const firebaseConfig = {
+    apiKey: "AIzaSyAYoBv6FJOO1kBkpabZjodZQJKacnWK11w",
+    authDomain: "ppas-celex.firebaseapp.com",
+    databaseURL: "https://ppas-celex.firebaseio.com",
+    projectId: "ppas-celex",
+    storageBucket: "ppas-celex.appspot.com",
+    messagingSenderId: "673600008493",
+    appId: "1:673600008493:web:beec28e4844969c3bfa3a4"
   };
 
   firebase.initializeApp(firebaseConfig);
@@ -74,7 +75,6 @@ async function main() {
 
       // subscribe to the guestbook collection
       subscribeGuestbook();
-
     } else {
       startRsvpButton.textContent = "RSVP";
       // Hide guestbook for non-logged-in users
@@ -106,44 +106,32 @@ async function main() {
   });
 
   // Listen to guestbook updates
-function subscribeGuestbook(){
-   // Create query for messages
- guestbookListener = firebase.firestore().collection("guestbook")
- .orderBy("timestamp","desc")
- .onSnapshot((snaps) => {
-   // Reset page
-   guestbook.innerHTML = "";
-   // Loop through documents in database
-   snaps.forEach((doc) => {
-     // Create an HTML entry for each document and add it to the chat
-     const entry = document.createElement("p");
-     entry.textContent = doc.data().name + ": " + doc.data().text;
-     guestbook.appendChild(entry);
-   });
- });
-};
+  function subscribeGuestbook() {
+    // Create query for messages
+    guestbookListener = firebase
+      .firestore()
+      .collection("guestbook")
+      .orderBy("timestamp", "desc")
+      .onSnapshot(snaps => {
+        // Reset page
+        guestbook.innerHTML = "";
+        // Loop through documents in database
+        snaps.forEach(doc => {
+          // Create an HTML entry for each document and add it to the chat
+          const entry = document.createElement("p");
+          entry.textContent = doc.data().name + ": " + doc.data().text;
+          guestbook.appendChild(entry);
+        });
+      });
+  }
 
-// Unsubscribe from guestbook updates
-function unsubscribeGuestbook(){
- if (guestbookListener != null)
- {
-   guestbookListener();
-   guestbookListener = null;
- }
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // Unsubscribe from guestbook updates
+  function unsubscribeGuestbook() {
+    if (guestbookListener != null) {
+      guestbookListener();
+      guestbookListener = null;
+    }
+  }
 }
 
 main();
