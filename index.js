@@ -44,7 +44,8 @@ async function main() {
     credentialHelper: firebaseui.auth.CredentialHelper.NONE,
     signInOptions: [
       // Email / Password Provider.
-      firebase.auth.EmailAuthProvider.PROVIDER_ID
+      firebase.auth.EmailAuthProvider.PROVIDER_ID,
+      firebase.auth.e
     ],
     callbacks: {
       signInSuccessWithAuthResult: function(authResult, redirectUrl) {
@@ -91,6 +92,8 @@ async function main() {
     } else {
       btnLogin.textContent = "Log In";
       menusContainer.style.display = "none";
+      dataTable.style.display = "none";
+      //master@celex.com.my
       // Unsubscribe
       //unsubscribeGuestbook();
     }
