@@ -14,7 +14,6 @@ const btnLogin = document.getElementById("btnLogin");
 const userContainer = document.getElementById("user-container");
 const menusContainer = document.getElementById("menus-container");
 
-
 const form = document.getElementById("leave-message");
 const input = document.getElementById("message");
 const guestbook = document.getElementById("guestbook");
@@ -23,7 +22,7 @@ const rsvpYes = document.getElementById("rsvp-yes");
 const rsvpNo = document.getElementById("rsvp-no");
 
 var rsvpListener = null;
-var guestbookListener = null;
+var latestActivitiesListener = null;
 
 async function main() {
   // Add Firebase project configuration object here
@@ -71,7 +70,7 @@ async function main() {
     if (user) {
       btnLogin.textContent = "Log Out";
       menusContainer.style.display = "block";
-      //UserList();
+      ModeSelection();
     } else {
       btnLogin.textContent = "Log In";
       menusContainer.style.display = "none";
@@ -81,6 +80,7 @@ async function main() {
   });
 
   // Listen to the form submission
+  /*
   form.addEventListener("submit", e => {
     // Prevent the default form redirect
     e.preventDefault();
@@ -100,29 +100,94 @@ async function main() {
     // Return false to avoid redirect
     return false;
   });
+  */
 
-  function UserList() {
-    var iLoop = 0;
-    guestbookListener = firebase
+  function ModeSelection() {
+    var url = document.location.href;
+    var mode = findGetParameter("mode");
+    //console.log(url);
+    //console.log(window.location.search.substr(1));
+    //console.log();
+    switch (mode) {
+      case "user":
+        UserList();
+        break;
+      case "latest":
+        Latest();
+        break;
+      case "import":
+        Import();
+        break;
+    }
+    //UserList();
+  }
+
+  function findGetParameter(parameterName) {
+    var result = null,
+      tmp = [];
+    location.search
+      .substr(1)
+      .split("&")
+      .forEach(function(item) {
+        tmp = item.split("=");
+        if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+      });
+    return result;
+  }
+
+  function UserList() {}
+
+  function Latest() {
+    var html_table = '* Only 50 Records <table width="100%" cellpadding="5" style="font-size:12px;" >';
+    html_table += "<tr>";
+    html_table += "  <td><b>Name</b></td>";
+    html_table += "  <td><b>Card No.</b></td>";
+    html_table += "  <td><b>Email</b></td>";
+    html_table += "  <td><b>Gender</b></td>";
+    html_table += "  <td><b>IC No.</b></td>";
+    html_table += "  <td><b>Created</b></td>";
+    html_table += "</tr>";
+
+    latestActivitiesListener = firebase
       .firestore()
       .collection("users")
-      .limit(10)
+      .orderBy("dateCreated", "desc")
+      .limit(50)
       .onSnapshot(snaps => {
         // Reset page
-        users.innerHTML = "";
+        latest.innerHTML = "";
+        var trData = "";
         // Loop through documents in database
         snaps.forEach(doc => {
-          const entry = document.createElement("p");
-          entry.textContent = doc.data().cardNo + ": " + doc.data().name;
-          users.appendChild(entry);
+          trData +=
+            "<tr><td>" +
+            doc.data().name +
+            "</td><td>" +
+            doc.data().cardNo +
+            "</td><td>" +
+            doc.data().email +
+            "</td><td>" +
+            doc.data().gender +
+            "</td><td>" +
+            doc.data().icNo +
+            "</td><td>" +
+            doc.data().dateCreated.toDate().toDateString() +
+            "</td></tr>";
+
+          //const entry = document.createElement("tr");
+          //entry.textContent = doc.data().cardNo + ": " + doc.data().name;
         });
+        html_table += trData + "</table>";
+        latest.innerHTML = html_table;
       });
   }
 
+  function Import() {}
+
   function unsubscribeGuestbook() {
-    if (guestbookListener != null) {
-      guestbookListener();
-      guestbookListener = null;
+    if (latestActivitiesListener != null) {
+      latestActivitiesListener();
+      latestActivitiesListener = null;
     }
   }
 }

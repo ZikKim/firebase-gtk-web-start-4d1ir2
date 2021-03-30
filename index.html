@@ -1,6 +1,6 @@
 <head>
   <meta charset="utf-8" />
-  <title>Firebase Meetup</title>
+  <title>Firebase</title>
   <link
     type="text/css"
     rel="stylesheet"
@@ -19,16 +19,18 @@
 
 <body>
   <div id="app">
-    <section id="event-details-container">      
-      <button id="btnLogin">Login</button>
+    <section id="event-details-container">
+      <div width="100%" align="right">
+        <button id="btnLogin">Login</button>
+      </div>
     </section>
 
     <section id="menus-container" style="display:none;">
       <label id="btnSearch"><a href="?mode=user">User Search</a></label>
       &nbsp;&nbsp;&nbsp;&nbsp;
-      <label id="btnLatest"><a href="#">Latest Activities</a></label>
+      <label id="btnLatest"><a href="?mode=latest">Latest Activities</a></label>
       &nbsp;&nbsp;&nbsp;&nbsp;
-      <label id="btnImport"><a href="#">Import Data</a></label>
+      <label id="btnImport"><a href="?mode=import">Import Data</a></label>
       &nbsp;&nbsp;&nbsp;&nbsp;
     </section>
 
@@ -49,6 +51,13 @@
       </form>
     </section -->
 
-    <section id="users"></section>
+    <section id="usersearch">
+      <div width="100%" align="left" style="font-size:15px;">
+        Search Keywords <input type="text" id="search_keyword" />
+        <button type="submit" style="font-size:11px;">Filter</button>
+      </div>
+    </section>
+
+    <section id="latest" style="font-size:11px;"></section>
   </div>
 </body>
