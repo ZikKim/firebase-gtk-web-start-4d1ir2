@@ -1,6 +1,20 @@
 <head>
   <meta charset="utf-8" />
   <title>Firebase</title>
+  <!-- Latest compiled and minified CSS -->
+  <link
+    rel="stylesheet"
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous"
+  />
+
+  <link
+    type="text/css"
+    rel="stylesheet"
+    href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css"
+  />
+
   <link
     type="text/css"
     rel="stylesheet"
@@ -26,11 +40,13 @@
     </section>
 
     <section id="menus-container" style="display:none;">
-      <label id="btnSearch"><a href="?mode=user">User Search</a></label>
-      &nbsp;&nbsp;&nbsp;&nbsp;
       <label id="btnLatest"><a href="?mode=latest">Latest Activities</a></label>
       &nbsp;&nbsp;&nbsp;&nbsp;
-      <label id="btnImport"><a href="?mode=import">Import Data</a></label>
+      <label id="btnLatest"><a href="?mode=libcard">Library Cards</a></label>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <label id="btnImport"
+        ><a href="?mode=import">Import Library Cards</a></label
+      >
       &nbsp;&nbsp;&nbsp;&nbsp;
     </section>
 
@@ -51,13 +67,63 @@
       </form>
     </section -->
 
-    <section id="usersearch">
-      <div width="100%" align="left" style="font-size:15px;">
-        Search Keywords <input type="text" id="search_keyword" />
-        <button type="submit" style="font-size:11px;">Filter</button>
-      </div>
+    <section id="welcome" style="font-size:16px; display:none">
+      <br /><br /><br /><br />
+      <div align="center" width="100%">PPAS Administrator</div>
     </section>
 
-    <section id="latest" style="font-size:11px;"></section>
+    <section id="usersearch" style="display:none">
+      <form id="frmSearch">
+        <div width="100%" align="left" style="font-size:15px;">
+          Search Keywords
+          <input
+            type="text"
+            id="search_keyword"
+            style="padding:8px; color:blue"
+          />
+          <button type="submit" style="font-size:11px;" id="btnFilter">
+            Filter
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section id="dataTable" style="font-size:11px;"></section>
   </div>
+
+  <!-- Modal -->
+  <div id="UserEdit" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            &times;
+          </button>
+          <h4 class="modal-title">Modal Header</h4>
+        </div>
+        <div class="modal-body">
+          <p>Some text in the modal.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script
+    src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+    integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+    crossorigin="anonymous"
+  ></script>
+  <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 </body>
