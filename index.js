@@ -25,6 +25,8 @@ const frmSearch = document.getElementById("frmSearch");
 
 var latestActivitiesListener = null;
 
+//var sortOrder = "desc";
+
 async function main() {
   // Add Firebase project configuration object here
   const firebaseConfig = {
@@ -67,12 +69,42 @@ async function main() {
     }
   });
 
-  /*btnEdit.addEventListener("click", () => {
-    console.log("btnEdit");
-  });*/
+  btnFilter.addEventListener("click", e => {
+    e.preventDefault();
+    var mode = findGetParameter("mode");
+    if (mode == "latest") {
+      //Latest($("#search_keyword").val());
+      Latest();
+    }
+    if (mode == "libcard") {
+      //LibCard($("#search_keyword").val());
+      LibCard();
+    }
+    return false;
+  });
+
+  btnOlder.addEventListener("click", e => {
+    e.preventDefault();
+    var mode = findGetParameter("mode");
+
+    if (localStorage.getItem("sortOrder") === "desc") {
+      localStorage.setItem("sortOrder", "asc");
+    } else {
+      localStorage.setItem("sortOrder", "desc");
+    }
+
+    if (mode == "latest") {
+      dtExample();
+      //Latest($("#search_keyword").val());
+    }
+    if (mode == "libcard") {
+      LibCard($("#search_keyword").val());
+    }
+    return false;
+  });
 
   frmSearch.addEventListener("submit", e => {
-    var mode = findGetParameter("mode");
+    /*var mode = findGetParameter("mode");
     e.preventDefault();
     if (mode == "latest") {
       Latest($("#search_keyword").val());
@@ -80,7 +112,7 @@ async function main() {
     if (mode == "libcard") {
       LibCard($("#search_keyword").val());
     }
-    return false;
+    return false;*/
   });
 
   // Listen to the current Auth state
@@ -93,6 +125,8 @@ async function main() {
       btnLogin.textContent = "Log In";
       menusContainer.style.display = "none";
       dataTable.style.display = "none";
+      Search.style.display = "none";
+
       //master@celex.com.my
       // Unsubscribe
       //unsubscribeGuestbook();
@@ -152,7 +186,7 @@ function ModeSelection() {
 }
 
 function Welcome() {
-  welcome.style.display = "block";
+  WelcomeSec.style.display = "block";
 }
 
 function findGetParameter(parameterName) {
@@ -168,195 +202,70 @@ function findGetParameter(parameterName) {
   return result;
 }
 
-function LibCard(searchKeyword) {
-  dataTable.innerHTML = "";
-  var html_table =
-    "<i>* Only the 50 latest registered records are shown.</i><br><br>";
-  html_table += '<table width="100%" id="tbUsers">';
-  html_table += "<tr>";
-  html_table += "  <td><b>No.</b></td>";
-  html_table += "  <td><b>Card No.</b></td>";
-  html_table += "  <td><b>Email</b></td>";
-  html_table += "</tr>";
+function LibCard() {}
 
-  //.orderBy("dateCreated", "desc")
-  //.limit(50)
-  var key = searchKeyword + "";
-  key = key.toLowerCase();
-  if (key.length > 3 && key != "undefined") {
-    latestActivitiesListener = firebase
-      .firestore()
-      .collection("libraryCards")
-      .orderBy("no", "desc")
-      .onSnapshot(snaps => {
-        var trData = "";
-        snaps.forEach(doc => {
-          if (
-            doc
-              .data()
-              .email.toLowerCase()
-              .includes(key) ||
-            doc
-              .data()
-              .cardNo.toLowerCase()
-              .includes(key)
-          ) {
-            trData +=
-              "<tr><td>" +
-              doc.data().no +
-              "</td><td>" +
-              doc.data().cardNo +
-              "</td><td>" +
-              doc.data().email +
-              "</td><td>" +
-              " <label> <a href='#' onclick='popUserEdit(1);'>&#9998;</a></label>  <label><a href='#'>&#9003;</a></label> " +
-              "</td></tr>";
-          }
-        });
-        trData += '<tr><td align="center" colspan="3">End of Records</td></tr>';
-        html_table += trData + "</table>";
-        dataTable.innerHTML = html_table;
-        usersearch.style.display = "block";
+function Latest() {
+  var arrData = new Array();
+  var iLoop = 0;
+  latestActivitiesListener = firebase
+    .firestore()
+    .collection("users")
+    .orderBy("dateCreated", "desc")
+    .onSnapshot(snaps => {
+      snaps.forEach(doc => {
+        arrData[iLoop] = new Array(
+          fbDataCheck(doc.data().name),
+          fbDataCheck(doc.data().cardNo),
+          fbDataCheck(doc.data().email),
+          fbDataCheck(doc.data().gender),
+          fbDataCheck(doc.data().icNo),
+          firebaseTime(doc.data().dateCreated)
+        );
+        iLoop++;
+        //Search.style.display = "block";
       });
+
+      $("#dtFirebase").DataTable({
+        data: arrData,
+        columns: [
+          { title: "Name" },
+          { title: "Card No." },
+          { title: "Email" },
+          { title: "Gender" },
+          { title: "IC No." },
+          { title: "Created" }
+        ]
+      });
+    });
+
+  console.log(arrData);
+}
+function fbDataCheck(node) {
+  if (typeof node !== "undefined") {
+    return node;
   } else {
-    latestActivitiesListener = firebase
-      .firestore()
-      .collection("libraryCards")
-      .orderBy("no", "desc")
-      .limit(50)
-      .onSnapshot(snaps => {
-        var trData = "";
-        snaps.forEach(doc => {
-          trData +=
-            "<tr><td>" +
-            doc.data().no +
-            "</td><td>" +
-            doc.data().cardNo +
-            "</td><td>" +
-            doc.data().email +
-            "</td><td>" +
-            " <label> <a href='javascript:popUserEdit(2);'>&#9998;</a></label>  <label><a href='#'>&#9003;</a></label> " +
-            "</td></tr>";
-        });
-        trData += '<tr><td align="center" colspan="3">End of Records</td></tr>';
-        html_table += trData + "</table>";
-        dataTable.innerHTML = html_table;
-        usersearch.style.display = "block";
-      });
+    return "n/a";
   }
 }
 
-function Latest(searchKeyword) {
-  dataTable.innerHTML = "";
-  var html_table =
-    "<i>* Only the 50 latest registered records are shown.</i><br><br>";
-  html_table += '<table width="100%" id="tbUsers">';
-  html_table += "<tr>";
-  html_table += "  <td><b>Name</b></td>";
-  html_table += "  <td><b>Card No.</b></td>";
-  html_table += "  <td><b>Email</b></td>";
-  html_table += "  <td><b>Gender</b></td>";
-  html_table += "  <td><b>IC No.</b></td>";
-  html_table += "  <td><b>Created</b></td>";
-  html_table += "  <td><b>Tools</b></td>";
-  html_table += "</tr>";
-
-  //.orderBy("dateCreated", "desc")
-  //.limit(50)
-  var key = searchKeyword + "";
-  key = key.toLowerCase();
-  if (key.length > 3 && key != "undefined") {
-    latestActivitiesListener = firebase
-      .firestore()
-      .collection("users")
-      .orderBy("dateCreated", "desc")
-      .onSnapshot(snaps => {
-        var trData = "";
-        snaps.forEach(doc => {
-          if (
-            doc
-              .data()
-              .name.toLowerCase()
-              .includes(key) ||
-            doc
-              .data()
-              .email.toLowerCase()
-              .includes(key) ||
-            doc
-              .data()
-              .icNo.toLowerCase()
-              .includes(key) ||
-            doc
-              .data()
-              .cardNo.toLowerCase()
-              .includes(key) ||
-            doc
-              .data()
-              .dateCreated.toDate()
-              .toDateString()
-              .toLowerCase()
-              .includes(key)
-          ) {
-            trData +=
-              "<tr><td>" +
-              doc.data().name +
-              "</td><td>" +
-              doc.data().cardNo +
-              "</td><td>" +
-              doc.data().email +
-              "</td><td>" +
-              doc.data().gender +
-              "</td><td>" +
-              doc.data().icNo +
-              "</td><td>" +
-              doc
-                .data()
-                .dateCreated.toDate()
-                .toDateString() +
-              "</td><td>" +
-              " <label> <a href='#' onclick='popUserEdit(1);'>&#9998;</a></label>  <label><a href='#'>&#9003;</a></label> " +
-              "</td></tr>";
-          }
-        });
-        trData += '<tr><td align="center" colspan="6">End of Records</td></tr>';
-        html_table += trData + "</table>";
-        dataTable.innerHTML = html_table;
-        usersearch.style.display = "block";
-      });
+function firebaseTime(fbTime) {
+  if (typeof fbTime !== "undefined") {
+    var u = new Date(fbTime.seconds * 1000);
+    return (
+      u.getUTCFullYear() +
+      "-" +
+      ("0" + u.getUTCMonth()).slice(-2) +
+      "-" +
+      ("0" + u.getUTCDate()).slice(-2) +
+      " " +
+      ("0" + u.getUTCHours()).slice(-2) +
+      ":" +
+      ("0" + u.getUTCMinutes()).slice(-2) +
+      ":" +
+      ("0" + u.getUTCSeconds()).slice(-2)
+    ); // + '.' + (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5)
   } else {
-    latestActivitiesListener = firebase
-      .firestore()
-      .collection("users")
-      .orderBy("dateCreated", "desc")
-      .limit(50)
-      .onSnapshot(snaps => {
-        var trData = "";
-        snaps.forEach(doc => {
-          trData +=
-            "<tr><td>" +
-            doc.data().name +
-            "</td><td>" +
-            doc.data().cardNo +
-            "</td><td>" +
-            doc.data().email +
-            "</td><td>" +
-            doc.data().gender +
-            "</td><td>" +
-            doc.data().icNo +
-            "</td><td>" +
-            doc
-              .data()
-              .dateCreated.toDate()
-              .toDateString() +
-            "</td><td>" +
-            " <label> <a href='javascript:popUserEdit(2);'>&#9998;</a></label>  <label><a href='#'>&#9003;</a></label> " +
-            "</td></tr>";
-        });
-        trData += '<tr><td align="center" colspan="6">End of Records</td></tr>';
-        html_table += trData + "</table>";
-        dataTable.innerHTML = html_table;
-        usersearch.style.display = "block";
-      });
+    return "";
   }
 }
 

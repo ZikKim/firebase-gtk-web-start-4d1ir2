@@ -134,12 +134,12 @@ button.firebaseui-id-submit.mdl-button--raised.mdl-button--colored {
   font-weight: bold;
   height: 36px;
   justify-content: center;
-  margin: 8px 16px;
+  margin: 2px 2px;
   outline-color: rgb(60, 67, 154);
   overflow: hidden;
-  padding: 0px 15px;
+  padding: 4px 8px;
   position: relative;
   text-align: center;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   vertical-align: middle;
 }
