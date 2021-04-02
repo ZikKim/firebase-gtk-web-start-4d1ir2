@@ -140,7 +140,7 @@ async function main() {
     }
     return false;
   });
-
+  
   //Event Handelers for LibModal Windows ===============================>
   btnLibUntag.addEventListener("click", e => {
     e.preventDefault();
@@ -191,6 +191,23 @@ async function main() {
     }
     return false;
   });
+
+  btnImportCards.addEventListener("click", e => {
+    e.preventDefault();
+    var newCards = $.trim($('#txtNewCards').val());
+    if(newCards != ""){
+      newCards = newCards.replace(/\s/g, '');
+      var arrCards = newCards.split(",").filter(function (el) { return el != null; });
+      if(confirm('A total of ' + newCards.length + ' new codes were found. Do you want to continue?')){
+        arrCards.forEach(function(item) {
+          alert(item);
+        });
+      }
+    }
+    return false;
+  });
+  
+
 } // and 'async main' function
 
 function Welcome() {
@@ -218,10 +235,7 @@ function ModeSelection() {
 function findGetParameter(parameterName) {
   var result = null,
     tmp = [];
-  location.search
-    .substr(1)
-    .split("&")
-    .forEach(function(item) {
+  location.search.substr(1).split("&").forEach(function(item) {
       tmp = item.split("=");
       if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
     });
