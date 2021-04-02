@@ -202,7 +202,37 @@ function findGetParameter(parameterName) {
   return result;
 }
 
-function LibCard() {}
+function LibCard() {
+  var arrData = new Array();
+  var iLoop = 0;
+  latestActivitiesListener = firebase
+    .firestore()
+    .collection("libraryCards")
+    .orderBy("no", "desc")
+    .onSnapshot(snaps => {
+      snaps.forEach(doc => {
+        arrData[iLoop] = new Array(
+          fbDataCheck(doc.data().no),
+          fbDataCheck(doc.data().cardNo),
+          fbDataCheck(doc.data().email)
+        );
+        iLoop++;
+        //Search.style.display = "block";
+      });
+
+      var table =$("#dtFirebase").DataTable({
+        data: arrData,
+        columns: [{ title: "No." }, { title: "Card No." }, { title: "Email" }],
+        order: [[0, "desc"]],
+        pageLength: 50
+      });
+
+      $('#dtFirebase tbody').on('click', 'tr', function () {
+        var data = table.row( this ).data();
+        alert( 'You clicked on '+data[0]+'\'s row' );
+      });
+    });
+}
 
 function Latest() {
   var arrData = new Array();
@@ -225,7 +255,7 @@ function Latest() {
         //Search.style.display = "block";
       });
 
-      $("#dtFirebase").DataTable({
+      var table = $("#dtFirebase").DataTable({
         data: arrData,
         columns: [
           { title: "Name" },
@@ -234,12 +264,19 @@ function Latest() {
           { title: "Gender" },
           { title: "IC No." },
           { title: "Created" }
-        ]
+        ],
+        order: [[5, "desc"]],
+        pageLength: 50
       });
-    });
 
-  console.log(arrData);
+      $('#dtFirebase tbody').on('click', 'tr', function () {
+        var data = table.row( this ).data();
+        alert( 'You clicked on '+data[0]+'\'s row' );
+      });
+
+    });
 }
+
 function fbDataCheck(node) {
   if (typeof node !== "undefined") {
     return node;
@@ -250,20 +287,29 @@ function fbDataCheck(node) {
 
 function firebaseTime(fbTime) {
   if (typeof fbTime !== "undefined") {
-    var u = new Date(fbTime.seconds * 1000);
-    return (
-      u.getUTCFullYear() +
-      "-" +
-      ("0" + u.getUTCMonth()).slice(-2) +
-      "-" +
-      ("0" + u.getUTCDate()).slice(-2) +
-      " " +
-      ("0" + u.getUTCHours()).slice(-2) +
-      ":" +
-      ("0" + u.getUTCMinutes()).slice(-2) +
-      ":" +
-      ("0" + u.getUTCSeconds()).slice(-2)
-    ); // + '.' + (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5)
+    var d = new Date(fbTime.seconds * 1000), // Convert the passed timestamp to milliseconds
+      yyyy = d.getFullYear(),
+      mm = ("0" + (d.getMonth() + 1)).slice(-2), // Months are zero based. Add leading 0.
+      dd = ("0" + d.getDate()).slice(-2), // Add leading 0.
+      hh = d.getHours(),
+      h = hh,
+      min = ("0" + d.getMinutes()).slice(-2), // Add leading 0.
+      ampm = "AM",
+      time;
+
+    if (hh > 12) {
+      h = hh - 12;
+      ampm = "PM";
+    } else if (hh === 12) {
+      h = 12;
+      ampm = "PM";
+    } else if (hh == 0) {
+      h = 12;
+    }
+
+    // ie: 2014-03-24, 3:00 PM
+    time = yyyy + "-" + mm + "-" + dd + ", " + h + ":" + min + " " + ampm;
+    return time;
   } else {
     return "";
   }
