@@ -197,12 +197,39 @@ async function main() {
     var newCards = $.trim($('#txtNewCards').val());
     if(newCards != ""){
       newCards = newCards.replace(/\s/g, '');
-      var arrCards = newCards.split(",").filter(function (el) { return el != null; });
-      if(confirm('A total of ' + newCards.length + ' new codes were found. Do you want to continue?')){
+      var iLoop = 0;
+      var arrCards = newCards.split(",").filter(function (el) { return el != ''; });
+      var objData = new Object();
+      console.log(arrCards);
+
+      if(confirm('A total of ' + arrCards.length + ' new codes were found. Do you want to continue?')) {
         arrCards.forEach(function(item) {
-          alert(item);
+          objData = {"cardNo": item, "email": "", "no": nextLibCardNo};
+          iLoop++;
+          firebase.firestore().collection('libraryCards').add(objData).then(function(docRef) {
+            console.log("Document written with ID: ", docRef.id);
+          })
+          .catch(function(error) {
+            console.error("Error adding document: ", error);
+          });
+          nextLibCardNo++;
         });
-      }
+
+        //var jsonObj = JSON.stringify(arrData);
+        //console.log(arrData);
+        //console.log(jsonObj);
+        //return false;
+
+        /*firebase.firestore().collection('libraryCards').doc().set(arrData).then(() => {
+          console.log("Imported Data Successfully");
+          alert('Imported Data Successfully!');
+        })
+        .catch(error => {
+          console.error("Error Import Library Card Data: ", error);
+        });*/
+
+
+      } // if confirm
     }
     return false;
   });
