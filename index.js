@@ -96,10 +96,13 @@ function main() {
         .then(doc => {
           if (doc.exists) {
             //console.log("Document data:", doc.data());
+            //unTag exist card usage mage
             firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val())
               .update({
                 "untag": true
               });
+            
+
           } else {
             // doc.data() will be undefined in this case
             console.log("No such document!");
@@ -203,7 +206,8 @@ function LibCard() {
           doc.id,
           fbDataCheck(doc.data().no),
           fbDataCheck(doc.data().cardNo),
-          fbDataCheck(doc.data().email)
+          fbDataCheck(doc.data().email),
+          fbDataCheck(doc.data().untag),
         );
         iLoop++;
         //Search.style.display = "block";
@@ -215,7 +219,8 @@ function LibCard() {
           { title: "Doc Id" },
           { title: "No." },
           { title: "Card No." },
-          { title: "Email" }
+          { title: "Email" },
+          { title: "Untag" }
         ],
         order: [[1, "desc"]],
         pageLength: 50
@@ -235,7 +240,7 @@ function LibCard() {
           $("#LibModal").modal("show");
           $("#LibModalDocId").val(data[0]);
           $("#LibModalCardNo").html(data[2]);
-          $("#LibModalEmail").html(data[3]);
+          $("#LibModalEmail").html(data[3]);          
         }
         //alert( 'You clicked on '+data[0]+'\'s row' );
       });
