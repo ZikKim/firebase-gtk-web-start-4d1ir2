@@ -101,10 +101,17 @@ function main() {
             if (!doc.data().untag) {
               firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val()).update({
                   untag: true
-                });
-              console.log("untaged:  " +doc.data().no +" " +doc.data().cardNo +" " +doc.data().email);
+                });   
+              
+              console.log("Rebuild Lib Card : " + doc.data().no + " " + doc.data().cardNo + " " + doc.data().email );
 
-              //Release library card is ready!
+              firebase.firestore().collection("users").where("email", "==", doc.data().email).onSnapshot(snaps => {
+              snaps.forEach(doc => {
+                firebase.firestore().collection("users").doc(doc.id).update({"cardNo":""});
+                console.log("Untagging User :  "  + doc.data().email + " " + doc.data().name);
+              })});
+              
+              //Release library card is ready!              
               firebase.firestore().collection("libraryCards").doc().set({
                 "cardNo": doc.data().cardNo,
                 "email": "",
