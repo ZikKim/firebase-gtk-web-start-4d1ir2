@@ -66,23 +66,31 @@ function main() {
   //Event Handelers for UserModal Windows ===============================>
   btnUserDelete.addEventListener("click", e => {
     e.preventDefault();
-    if (confirm("Are you sure proceed to DELETE ? ")) {
+    if (confirm("Are you sure proceed to DELETE and Untag ? ")) {
       //alert($('#UserModalDocId').val());
-      firebase
-        .firestore()
-        .collection("users")
-        .doc($("#UserModalDocId").val())
-        .delete()
-        .then(() => {
-          // deleted
-          tableFirebase
-            .row(".selected")
-            .remove()
-            .draw(false);
+      firebase.firestore().collection("users").doc($("#UserModalDocId").val()).delete().then(() => {
+
+          //search email address from LibCard tagged, and untagging for rebuild
+          firebase.firestore().collection("libraryCards")
+          .where("cardNo","==",$("#UserModalTagedCardNo").val())
+          .where("email", "==", $("#UserModalTagedEmail").val())
+          .onSnapshot(snaps => {
+            snaps.forEach(doc => {
+
+              //Remark untagging on untag field as boolean
+              firebase.firestore().collection("libraryCards").doc(doc.id).update({"untag": true});
+              console.log("Untagging User :  "  + doc.data().email + " " + doc.data().cardNo);
+
+            })
+          });
+
+          // Deletion apply to the DataTables
+          tableFirebase.row(".selected").remove().draw(false);
           $("#UserModal").modal("toggle");
           console.log("Document successfully deleted!");
-        })
-        .catch(error => {
+
+        }).catch(error => {
+          //Any Error While deleting on Firebase documnet
           alert("Error removing document: ", error);
           console.error("Error removing document: ", error);
         });
@@ -90,6 +98,8 @@ function main() {
     return false;
   });
 
+
+  //Event Handelers for LibModal Windows ===============================>
   btnLibUntag.addEventListener("click", e => {
     e.preventDefault();
     if (confirm("Are you sure proceed to Untag ? ")) {
@@ -100,7 +110,7 @@ function main() {
             //unTag exist card usage mage
             if (!doc.data().untag) {
               firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val()).update({
-                  untag: true
+                  "untag": true
                 });   
               
               console.log("Rebuild Lib Card : " + doc.data().no + " " + doc.data().cardNo + " " + doc.data().email );
@@ -170,32 +180,15 @@ function main() {
   });
 }
 
-// function parts
-
-function popUserEdit() {
-  console.log("popUserEdit");
-}
-
 function ModeSelection() {
   var url = document.location.href;
   var mode = findGetParameter("mode");
-  //console.log(url);
-  //console.log(window.location.search.substr(1));
-  //console.log();
   switch (mode) {
-    case "latest":
-      Users();
-      break;
-    case "libcard":
-      LibCard();
-      break;
-    case "import":
-      Import();
-      break;
-    default:
-      Welcome();
+    case "latest":  Users(); break;
+    case "libcard": LibCard(); break;
+    case "import":  Import(); break;
+    default:        Welcome();
   }
-  //UserList();
 }
 
 function Welcome() {
@@ -218,12 +211,7 @@ function findGetParameter(parameterName) {
 function LibCard() {
   var arrData = new Array();
   var iLoop = 0;
-  firebase
-    .firestore()
-    .collection("libraryCards")
-    .orderBy("no", "desc")
-    .limit(10)
-    .onSnapshot(snaps => {
+  firebase.firestore().collection("libraryCards").orderBy("no", "desc").limit(10).onSnapshot(snaps => {
       snaps.forEach(doc => {
         if (NextLibCardNo == 0) {
           NextLibCardNo = doc.data().no+1;
@@ -337,10 +325,13 @@ function Users() {
 
           tbFirebaseRowIndex = tr.index();
           $("#UserModal").modal("show");
-          $("#UserModalDocId").val(data[0]);
-          $("#UserModalName").html(data[1]);
+          $("#UserModalDocId").val(data[0]);  // document id. hidden from table
+          $("#UserModalName").html(data[1]);  
           $("#UserModalCardNo").html(data[2]);
           $("#UserModalEmail").html(data[3]);
+
+          $("#UserModalTagedCardNo").val(data[2]);
+          $("#UserModalTagedEmail").val(data[3]);
         }
 
         //alert( 'You clicked on '+data[0]+'\'s row' );
