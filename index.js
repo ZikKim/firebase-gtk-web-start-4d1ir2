@@ -90,7 +90,11 @@ async function main() {
     nextLibCardNo = doc.data().no + 1;
   });
 
+
   console.log("The next Lib cards number is : " + nextLibCardNo);
+
+  //firebase.firestore().collection("libraryCards").where("email", "==",).update({ untag: true });
+  console.log(" -- ");
 
   //Event Handelers for UserModal Windows ===============================>
   btnUserDelete.addEventListener("click", e => {
@@ -101,17 +105,18 @@ async function main() {
     if (confirm("Are you sure proceed to DELETE and Untag ? ")) {
       //alert($('#UserModalDocId').val());
       firebase.firestore().collection("users").doc($("#UserModalDocId").val()).delete().then(() => {
+
           //search email address from LibCard tagged, and untagging for rebuild
           firebase.firestore().collection("libraryCards")
+            .where("cardNo", "==", $("#UserModalTagedCardNo").val())
             .where("email", "==", $("#UserModalTagedEmail").val())
             .onSnapshot(snaps => {
-              snaps.forEach(doc => {
-                //Remark untagging on untag field as boolean
-                firebase.firestore().collection("libraryCards").doc(doc.id).update({ untag: true });
-                console.log("Untagging User :  " + doc.data().email + " " +doc.data().cardNo
-                );
-              });
+            snaps.forEach(doc => {
+              //Remark untagging on untag field as boolean
+              firebase.firestore().collection("libraryCards").doc(doc.id).update({ untag: true });
+              console.log("Untagging User :  " + doc.data().email + " " +doc.data().cardNo);
             });
+          });
 
           if ($("#UserModalTagedCardNo").val() != "") {
             //Release library card is ready!  == REBUILD ==
