@@ -272,6 +272,7 @@ function findGetParameter(parameterName) {
 function LibCard() {
   var arrData = new Array();
   var iLoop = 0;
+  
   firebase.firestore().collection("libraryCards").orderBy("no", "desc").onSnapshot(snaps => {
       snaps.forEach(doc => {
         arrData[iLoop] = new Array(
@@ -296,7 +297,7 @@ function LibCard() {
         ],
         order: [[1, "desc"]],
         pageLength: 50,
-        bDestroy: true
+        destroy: true
       });
 
       $("#dtFirebase tbody").on("click", "tr", function() {
@@ -324,9 +325,10 @@ function LibCard() {
         }
         //alert( 'You clicked on '+data[0]+'\'s row' ); xxxxxxxxx
       });
-
       $("#dtFirebase tr").css("cursor", "pointer");
     });
+    //console.log('reset arrData');
+    //arrData = new Array();
 }
 
 function Users() {
