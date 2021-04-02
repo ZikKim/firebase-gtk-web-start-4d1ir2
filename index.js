@@ -81,14 +81,17 @@ async function main() {
     }
   });
 
-  var fbRef = firebase.firestore().collection('libraryCards');
-  var fbDoc = await fbRef.orderBy("no","desc").limit(1).get();
+  var fbRef = firebase.firestore().collection("libraryCards");
+  var fbDoc = await fbRef
+    .orderBy("no", "desc")
+    .limit(1)
+    .get();
   fbDoc.forEach(doc => {
     nextLibCardNo = doc.data().no + 1;
   });
 
-  console.log('The next Lib cards number is : ' + nextLibCardNo);
-  
+  console.log("The next Lib cards number is : " + nextLibCardNo);
+
   //Event Handelers for UserModal Windows ===============================>
   btnUserDelete.addEventListener("click", e => {
     e.preventDefault();
@@ -98,37 +101,39 @@ async function main() {
     if (confirm("Are you sure proceed to DELETE and Untag ? ")) {
       //alert($('#UserModalDocId').val());
       firebase.firestore().collection("users").doc($("#UserModalDocId").val()).delete().then(() => {
-
           //search email address from LibCard tagged, and untagging for rebuild
           firebase.firestore().collection("libraryCards")
-          .where("cardNo","==",$("#UserModalTagedCardNo").val())
-          .where("email", "==", $("#UserModalTagedEmail").val())
-          .onSnapshot(snaps => {
-            snaps.forEach(doc => {
-              //Remark untagging on untag field as boolean
-              firebase.firestore().collection("libraryCards").doc(doc.id).update({"untag": true});
-              console.log("Untagging User :  "  + doc.data().email + " " + doc.data().cardNo);
-            })
-          });
+            .where("email", "==", $("#UserModalTagedEmail").val())
+            .onSnapshot(snaps => {
+              snaps.forEach(doc => {
+                //Remark untagging on untag field as boolean
+                firebase.firestore().collection("libraryCards").doc(doc.id).update({ untag: true });
+                console.log("Untagging User :  " + doc.data().email + " " +doc.data().cardNo
+                );
+              });
+            });
 
-          //Release library card is ready!  == REBUILD ==
-          firebase.firestore().collection("libraryCards").doc().set({
-            "cardNo": doc.data().cardNo,
-            "email": "",
-            "no": nextLibCardNo
-          }).then(() => {
-            console.log("Added & Rebuild LibCard successfully written!" + doc.data().cardNo + ' ' + nextLibCardNo);
-          })
-          .catch((error) => {
-            console.error("Error Rebuild libraryCards: ", error);
-          });
+          if ($("#UserModalTagedCardNo").val() != "") {
+            //Release library card is ready!  == REBUILD ==
+            firebase.firestore().collection("libraryCards").doc().set({
+                cardNo: $("#UserModalTagedCardNo").val(),
+                email: "",
+                no: nextLibCardNo
+              }).then(() => {
+                console.log("Added & Rebuild LibCard successfully written!" + $("#UserModalTagedCardNo").val() + " " + nextLibCardNo );
+              })
+              .catch(error => {
+                console.error("Error Rebuild libraryCards: ", error);
+              });
+          }
 
           // Deletion apply to the DataTables
           tableFirebase.row(".selected").remove().draw(false);
           $("#UserModal").modal("toggle");
           console.log("Document successfully deleted!");
 
-        }).catch(error => {
+        })
+        .catch(error => {
           //Any Error While deleting on Firebase documnet
           alert("Error removing document: ", error);
           console.error("Error removing document: ", error);
@@ -137,41 +142,45 @@ async function main() {
     return false;
   });
 
-
   //Event Handelers for LibModal Windows ===============================>
   btnLibUntag.addEventListener("click", e => {
     e.preventDefault();
     if (confirm("Are you sure proceed to Untag ? ")) {
-
-      firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val()).get().then(doc => {
+      firebase
+        .firestore()
+        .collection("libraryCards")
+        .doc($("#LibModalDocId").val())
+        .get()
+        .then(doc => {
           if (doc.exists) {
             //console.log("Document data:", doc.data());
             //unTag exist card usage mage
             if (!doc.data().untag) {
               firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val()).update({
-                  "untag": true
-                });   
-              
-              console.log("Rebuild Lib Card : " + doc.data().no + " " + doc.data().cardNo + " " + doc.data().email );
+                  untag: true
+                });
+
+              console.log("Rebuild Lib Card : " +doc.data().no +" " +doc.data().cardNo +" " +doc.data().email);
 
               firebase.firestore().collection("users").where("email", "==", doc.data().email).onSnapshot(snaps => {
-              snaps.forEach(doc => {
-                firebase.firestore().collection("users").doc(doc.id).update({"cardNo":""});
-                console.log("Untagging User :  "  + doc.data().email + " " + doc.data().name);
-              })});
+                  snaps.forEach(doc => {
+                    firebase.firestore().collection("users").doc(doc.id).update({ cardNo: "" });
+                    console.log("Untagging User :  " +doc.data().email +" " +doc.data().name);
+                  });
+                });
 
-              //Release library card is ready!              
+              //Release library card is ready!
               firebase.firestore().collection("libraryCards").doc().set({
-                "cardNo": doc.data().cardNo,
-                "email": "",
-                "no": nextLibCardNo
-              }).then(() => {
-                console.log("Added & Rebuild LibCard successfully written!");
-              })
-              .catch((error) => {
-                console.error("Error Rebuild libraryCards: ", error);
-              });
-
+                  cardNo: doc.data().cardNo,
+                  email: "",
+                  no: nextLibCardNo
+                })
+                .then(() => {
+                  console.log("Added & Rebuild LibCard successfully written!");
+                })
+                .catch(error => {
+                  console.error("Error Rebuild libraryCards: ", error);
+                });
             } else {
               console.log("already untaged document");
             }
@@ -197,10 +206,17 @@ function ModeSelection() {
   var url = document.location.href;
   var mode = findGetParameter("mode");
   switch (mode) {
-    case "latest":  Users(); break;
-    case "libcard": LibCard(); break;
-    case "import":  Import(); break;
-    default:        Welcome();
+    case "latest":
+      Users();
+      break;
+    case "libcard":
+      LibCard();
+      break;
+    case "import":
+      Import();
+      break;
+    default:
+      Welcome();
   }
 }
 
@@ -221,7 +237,7 @@ function LibCard() {
   var arrData = new Array();
   var iLoop = 0;
   firebase.firestore().collection("libraryCards").orderBy("no", "desc").onSnapshot(snaps => {
-      snaps.forEach(doc => {        
+      snaps.forEach(doc => {
         arrData[iLoop] = new Array(
           doc.id,
           fbDataCheck(doc.data().no),
@@ -255,19 +271,19 @@ function LibCard() {
         } else {
           tableFirebase.$("tr.selected").removeClass("selected");
           $(this).addClass("selected");
-          if(data[3]=='') {
-            alert('No user tagged on this Library Card');
+          if (data[3] == "") {
+            alert("No user tagged on this Library Card");
           } else {
-            if(data[4]){
-              alert('This Library Card record is revoked');
+            if (data[4]) {
+              alert("This Library Card record is revoked");
             } else {
               tbFirebaseRowIndex = tr.index();
               $("#LibModal").modal("show");
               $("#LibModalDocId").val(data[0]);
               $("#LibModalCardNo").html(data[2]);
               $("#LibModalEmail").html(data[3]);
-            }          
-          }          
+            }
+          }
         }
         //alert( 'You clicked on '+data[0]+'\'s row' ); xxxxxxxxx
       });
@@ -330,8 +346,8 @@ function Users() {
 
           tbFirebaseRowIndex = tr.index();
           $("#UserModal").modal("show");
-          $("#UserModalDocId").val(data[0]);  // document id. hidden from table
-          $("#UserModalName").html(data[1]);  
+          $("#UserModalDocId").val(data[0]); // document id. hidden from table
+          $("#UserModalName").html(data[1]);
           $("#UserModalCardNo").html(data[2]);
           $("#UserModalEmail").html(data[3]);
 
@@ -385,7 +401,5 @@ function firebaseTime(fbTime) {
 }
 
 function Import() {}
-
-
 
 main();
