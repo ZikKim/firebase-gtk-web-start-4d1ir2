@@ -125,7 +125,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" id="btnUserDelete">Delete & Untag</button>
-          <button type="button" class="btn btn-warning">Untag</button>
+          <!-- button type="button" class="btn btn-warning">Untag</button -->
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
@@ -143,15 +143,15 @@
           <h4 class="modal-title">Library Card Action</h4>
         </div>
         <div class="modal-body">
+          <input type="hidden" id="LibModalDocId">
           <p><label>Please select an action for this Library Card </label></p>
           <p><span>Card No. : </span> <span id="LibModalCardNo">...</a></p>
           <p><span>Assigned User : </span> <span id="LibModalEmail">...</a></p>
           <p></p>
-
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger">Delete</button>
-          <button type="button" class="btn btn-warning">Untag User</button>
+          <button type="button" class="btn btn-danger" id="btnLibUntag">Untag</button>
+          <!-- button type="button" class="btn btn-warning">Delete</button -->
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
@@ -160,9 +160,13 @@
 
 
   <script>
-    function UserModalDelete() {
-      alert('clicked');
-    }
+
+    /*$.fn.dataTable.ext.errMode = 'none';
+    $('#dtFirebase').on('error.dt', function (e, settings, techNote, message)
+    {
+      console.log( 'An error has been reported by DataTables: ', message );
+    }).DataTable();*/
+
   </script>
   <!-- Latest compiled and minified JavaScript -->
   <script

@@ -14,22 +14,13 @@ const btnLogin = document.getElementById("btnLogin");
 const btnEdit = document.getElementById("btnEdit");
 //const userContainer = document.getElementById("user-container");
 const menusContainer = document.getElementById("menus-container");
-
 const frmSearch = document.getElementById("frmSearch");
-//const input = document.getElementById("message");
-//const guestbook = document.getElementById("guestbook");
-//const numberAttending = document.getElementById("number-attending");
-//const rsvpYes = document.getElementById("rsvp-yes");
-//const rsvpNo = document.getElementById("rsvp-no");
-//var rsvpListener = null;
-
-var latestActivitiesListener = null;
 
 //var sortOrder = "desc";
 var tbFirebaseRowIndex = -1;
 var tableFirebase;
 
-async function main() {
+function main() {
   // Add Firebase project configuration object here
   const firebaseConfig = {
     apiKey: "AIzaSyAYoBv6FJOO1kBkpabZjodZQJKacnWK11w",
@@ -83,14 +74,53 @@ async function main() {
         .delete()
         .then(() => {
           // deleted
-          tableFirebase.row(".selected").remove().draw(false);
+          tableFirebase
+            .row(".selected")
+            .remove()
+            .draw(false);
           $("#UserModal").modal("toggle");
           console.log("Document successfully deleted!");
         })
         .catch(error => {
           alert("Error removing document: ", error);
           console.error("Error removing document: ", error);
-        });      
+        });
+    }
+    return false;
+  });
+
+  btnLibUntag.addEventListener("click", e => {
+    e.preventDefault();
+    if (confirm("Are you sure proceed to Untag ? ")) {
+      firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val()).get()
+        .then(doc => {
+          if (doc.exists) {
+            //console.log("Document data:", doc.data());
+            firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val())
+              .update({
+                "untag": true
+              });
+          } else {
+            // doc.data() will be undefined in this case
+            console.log("No such document!");
+          }
+        })
+        .catch(error => {
+          console.log("Error getting document:", error);
+          return false;
+        });
+
+      /*
+        .set([
+          untag => true
+        ]).then(() => {          
+          $("#UserModal").modal("toggle");
+          console.log("Document successfully unTag!");
+        })
+        .catch(error => {
+          alert("Error removing document: ", error);
+          console.error("Error untagging document: ", error);
+        });*/
     }
     return false;
   });
@@ -162,7 +192,7 @@ function findGetParameter(parameterName) {
 function LibCard() {
   var arrData = new Array();
   var iLoop = 0;
-  latestActivitiesListener = firebase
+  firebase
     .firestore()
     .collection("libraryCards")
     .orderBy("no", "desc")
@@ -170,6 +200,7 @@ function LibCard() {
     .onSnapshot(snaps => {
       snaps.forEach(doc => {
         arrData[iLoop] = new Array(
+          doc.id,
           fbDataCheck(doc.data().no),
           fbDataCheck(doc.data().cardNo),
           fbDataCheck(doc.data().email)
@@ -178,18 +209,35 @@ function LibCard() {
         //Search.style.display = "block";
       });
 
-      var table = $("#dtFirebase").DataTable({
+      tableFirebase = $("#dtFirebase").DataTable({
         data: arrData,
-        columns: [{ title: "No." }, { title: "Card No." }, { title: "Email" }],
-        order: [[0, "desc"]],
+        columns: [
+          { title: "Doc Id" },
+          { title: "No." },
+          { title: "Card No." },
+          { title: "Email" }
+        ],
+        order: [[1, "desc"]],
         pageLength: 50
       });
 
       $("#dtFirebase tbody").on("click", "tr", function() {
-        var data = table.row(this).data();
-        $("#LibModal").modal("show");
-        $("#LibModalCardNo").html(data[1]);
-        $("#LibModalEmail").html(data[2]);
+        var data = tableFirebase.row(this).data();
+        var tr = $(this).closest("tr");
+
+        if ($(this).hasClass("selected")) {
+          $(this).removeClass("selected");
+        } else {
+          tableFirebase.$("tr.selected").removeClass("selected");
+          $(this).addClass("selected");
+
+          tbFirebaseRowIndex = tr.index();
+          $("#LibModal").modal("show");
+          $("#LibModalDocId").val(data[0]);
+          $("#LibModalCardNo").html(data[2]);
+          $("#LibModalEmail").html(data[3]);
+        }
+        //alert( 'You clicked on '+data[0]+'\'s row' );
       });
 
       $("#dtFirebase tr").css("cursor", "pointer");
@@ -200,10 +248,10 @@ function Users() {
   var arrData = new Array();
   var iLoop = 0;
   var tmpObj;
-  latestActivitiesListener = firebase
+  firebase
     .firestore()
     .collection("users")
-    .orderBy("dateCreated","desc")
+    .orderBy("dateCreated", "desc")
     .limit(10)
     .onSnapshot(snaps => {
       snaps.forEach(doc => {
