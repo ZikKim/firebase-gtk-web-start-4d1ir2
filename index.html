@@ -116,15 +116,16 @@
           <h4 class="modal-title">User Action</h4>
         </div>
         <div class="modal-body">
-          <p><label>Please select an action for this user </label></p>
+          <input type="hidden" id="UserModalDocId">
+          <p><label>Please select an action for this user </label></p>          
           <p><span>User Name : </span> <span id="UserModalName">...</a></p>
           <p><span>Library Card Number : </span> <span id="UserModalCardNo">...</a></p>
           <p><span>User Registered Email : </span> <span id="UserModalEmail">...</a></p>
           <p></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" id="btnUserDelete">Delete</button>
-          <button type="button" class="btn btn-warning">Deassign</button>
+          <button type="button" class="btn btn-danger" id="btnUserDelete">Delete & Untag</button>
+          <button type="button" class="btn btn-warning">Untag</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>

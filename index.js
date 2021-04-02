@@ -26,6 +26,8 @@ const frmSearch = document.getElementById("frmSearch");
 var latestActivitiesListener = null;
 
 //var sortOrder = "desc";
+var tbFirebaseRowIndex = -1;
+var tableFirebase;
 
 async function main() {
   // Add Firebase project configuration object here
@@ -69,25 +71,29 @@ async function main() {
     }
   });
 
+  //Event Handelers for UserModal Windows ===============================>
   btnUserDelete.addEventListener("click", e => {
     e.preventDefault();
-    if(confirm('Are you sure proceed to DELETE ? ')){
-      alert('deleted!');
-      
-      /*firebase
-      .firestore()
-      .collection("users")
-      .add({
-        text: input.value,
-        timestamp: Date.now(),
-        name: firebase.auth().currentUser.displayName,
-        userId: firebase.auth().currentUser.uid
-      });*/
-
-    }    
+    if (confirm("Are you sure proceed to DELETE ? ")) {
+      //alert($('#UserModalDocId').val());
+      firebase
+        .firestore()
+        .collection("users")
+        .doc($("#UserModalDocId").val())
+        .delete()
+        .then(() => {
+          // deleted
+          tableFirebase.row(".selected").remove().draw(false);
+          $("#UserModal").modal("toggle");
+          console.log("Document successfully deleted!");
+        })
+        .catch(error => {
+          alert("Error removing document: ", error);
+          console.error("Error removing document: ", error);
+        });      
+    }
     return false;
   });
-
 
   // Listen to the current Auth state
   firebase.auth().onAuthStateChanged(user => {
@@ -106,29 +112,6 @@ async function main() {
       //unsubscribeGuestbook();
     }
   });
-
-  // Listen to the form submission
-  /*
-  form.addEventListener("submit", e => {
-    // Prevent the default form redirect
-    e.preventDefault();
-
-    firebase
-      .firestore()
-      .collection("users")
-      .add({
-        text: input.value,
-        timestamp: Date.now(),
-        name: firebase.auth().currentUser.displayName,
-        userId: firebase.auth().currentUser.uid
-      });
-
-    // clear message input field
-    input.value = "";
-    // Return false to avoid redirect
-    return false;
-  });
-  */
 }
 
 // function parts
@@ -195,34 +178,37 @@ function LibCard() {
         //Search.style.display = "block";
       });
 
-      var table =$("#dtFirebase").DataTable({
+      var table = $("#dtFirebase").DataTable({
         data: arrData,
         columns: [{ title: "No." }, { title: "Card No." }, { title: "Email" }],
         order: [[0, "desc"]],
         pageLength: 50
       });
 
-      $('#dtFirebase tbody').on('click', 'tr', function () {
-        var data = table.row( this ).data();
-        $('#LibModal').modal('show');
-        $('#LibModalCardNo').html(data[1]);
-        $('#LibModalEmail').html(data[2]);
+      $("#dtFirebase tbody").on("click", "tr", function() {
+        var data = table.row(this).data();
+        $("#LibModal").modal("show");
+        $("#LibModalCardNo").html(data[1]);
+        $("#LibModalEmail").html(data[2]);
       });
 
-      $("#dtFirebase tr").css('cursor', 'pointer');
+      $("#dtFirebase tr").css("cursor", "pointer");
     });
 }
 
 function Users() {
   var arrData = new Array();
   var iLoop = 0;
+  var tmpObj;
   latestActivitiesListener = firebase
     .firestore()
     .collection("users")
+    .orderBy("dateCreated","desc")
     .limit(10)
     .onSnapshot(snaps => {
       snaps.forEach(doc => {
         arrData[iLoop] = new Array(
+          doc.id,
           fbDataCheck(doc.data().name),
           fbDataCheck(doc.data().cardNo),
           fbDataCheck(doc.data().email),
@@ -230,13 +216,15 @@ function Users() {
           fbDataCheck(doc.data().icNo),
           firebaseTime(doc.data().dateCreated)
         );
+
         iLoop++;
         //Search.style.display = "block";
       });
 
-      var table = $("#dtFirebase").DataTable({
+      tableFirebase = $("#dtFirebase").DataTable({
         data: arrData,
         columns: [
+          { title: "Doc Id" },
           { title: "Name" },
           { title: "Card No." },
           { title: "Email" },
@@ -244,24 +232,41 @@ function Users() {
           { title: "IC No." },
           { title: "Created" }
         ],
-        order: [[5, "desc"]],
-        pageLength: 50
+        order: [[6, "desc"]],
+        pageLength: 50,
+        columnDefs: [
+          {
+            targets: [0],
+            visible: false,
+            searchable: false
+          }
+        ]
       });
 
-      $('#dtFirebase tbody').on('click', 'tr', function () {
-        var data = table.row( this ).data();
-        $('#UserModal').modal('show');
-        $('#UserModalName').html(data[0]);
-        $('#UserModalCardNo').html(data[1]);
-        $('#UserModalEmail').html(data[2]);
+      $("#dtFirebase tbody").on("click", "tr", function() {
+        var data = tableFirebase.row(this).data();
+        var tr = $(this).closest("tr");
+
+        if ($(this).hasClass("selected")) {
+          $(this).removeClass("selected");
+        } else {
+          tableFirebase.$("tr.selected").removeClass("selected");
+          $(this).addClass("selected");
+
+          tbFirebaseRowIndex = tr.index();
+          $("#UserModal").modal("show");
+          $("#UserModalDocId").val(data[0]);
+          $("#UserModalName").html(data[1]);
+          $("#UserModalCardNo").html(data[2]);
+          $("#UserModalEmail").html(data[3]);
+        }
+
         //alert( 'You clicked on '+data[0]+'\'s row' );
       });
 
-      $("#dtFirebase tr").css('cursor', 'pointer');
-      
+      $("#dtFirebase tr").css("cursor", "pointer");
     });
 }
-
 
 function fbDataCheck(node) {
   if (typeof node !== "undefined") {
