@@ -105,27 +105,22 @@ async function main() {
           .where("email", "==", $("#UserModalTagedEmail").val())
           .onSnapshot(snaps => {
             snaps.forEach(doc => {
-
               //Remark untagging on untag field as boolean
               firebase.firestore().collection("libraryCards").doc(doc.id).update({"untag": true});
               console.log("Untagging User :  "  + doc.data().email + " " + doc.data().cardNo);
-
-              //Release library card is ready!  == REBUILD ==
-              firebase.firestore().collection("libraryCards").doc().set({
-                "cardNo": doc.data().cardNo,
-                "email": "",
-                "no": nextLibCardNo
-              }).then(() => {
-                console.log("Added & Rebuild LibCard successfully written!" + doc.data().cardNo + ' ' + nextLibCardNo);
-              })
-              .catch((error) => {
-                console.error("Error Rebuild libraryCards: ", error);
-              });
-              
-              //Increase CardNo in case multiple untagging
-              nextLibCardNo = nextLibCardNo +1;
-
             })
+          });
+
+          //Release library card is ready!  == REBUILD ==
+          firebase.firestore().collection("libraryCards").doc().set({
+            "cardNo": doc.data().cardNo,
+            "email": "",
+            "no": nextLibCardNo
+          }).then(() => {
+            console.log("Added & Rebuild LibCard successfully written!" + doc.data().cardNo + ' ' + nextLibCardNo);
+          })
+          .catch((error) => {
+            console.error("Error Rebuild libraryCards: ", error);
           });
 
           // Deletion apply to the DataTables
