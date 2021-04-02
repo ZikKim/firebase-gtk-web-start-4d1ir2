@@ -229,8 +229,12 @@ function LibCard() {
 
       $('#dtFirebase tbody').on('click', 'tr', function () {
         var data = table.row( this ).data();
-        alert( 'You clicked on '+data[0]+'\'s row' );
+        $('#LibModal').modal('show');
+        $('#LibModalCardNo').html(data[1]);
+        $('#LibModalEmail').html(data[2]);
       });
+
+      $("#dtFirebase tr").css('cursor', 'pointer');
     });
 }
 
@@ -271,9 +275,15 @@ function Latest() {
 
       $('#dtFirebase tbody').on('click', 'tr', function () {
         var data = table.row( this ).data();
-        alert( 'You clicked on '+data[0]+'\'s row' );
+        $('#UserModal').modal('show');
+        $('#UserModalName').html(data[0]);
+        $('#UserModalCardNo').html(data[1]);
+        $('#UserModalEmail').html(data[2]);
+        //alert( 'You clicked on '+data[0]+'\'s row' );
       });
 
+      $("#dtFirebase tr").css('cursor', 'pointer');
+      
     });
 }
 

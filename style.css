@@ -1,12 +1,12 @@
 @media all and (min-width: 1200px) {
   #app {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
   }
 }
 @media all and (min-width: 960px) and (max-width: 1199px) {
   #app {
-    max-width: 900px;
+    max-width: 1100px;
     margin: 0 auto;
   }
 }
@@ -37,6 +37,11 @@
     margin-left: 20px;
     margin-bottom: 20px;
   }
+}
+
+
+#dtFirebase tr:hover {
+	background-color: #ECFFB3;
 }
 
 hr {

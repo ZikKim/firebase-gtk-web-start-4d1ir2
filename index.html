@@ -102,9 +102,63 @@
     </section>
 
     <section id="dataTable" style="font-size:11px;">
-      <table id="dtFirebase" width="100%"></table>
+      <table id="dtFirebase" class="stripe" width="100%"></table>
     </section>
   </div>
+
+  <!-- User Modal -->
+  <div id="UserModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">User Action</h4>
+        </div>
+        <div class="modal-body">
+          <p><label>Please select an action for this user </label></p>
+          <p><span>User Name : </span> <span id="UserModalName">...</a></p>
+          <p><span>Library Card Number : </span> <span id="UserModalCardNo">...</a></p>
+          <p><span>User Registered Email : </span> <span id="UserModalEmail">...</a></p>
+          <p></p>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger">Delete</button>
+          <button type="button" class="btn btn-warning">Deassign</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- LibCard Modal -->
+  <div id="LibModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Library Card Action</h4>
+        </div>
+        <div class="modal-body">
+          <p><label>Please select an action for this Library Card </label></p>
+          <p><span>Card No. : </span> <span id="LibModalCardNo">...</a></p>
+          <p><span>Assigned User : </span> <span id="LibModalEmail">...</a></p>
+          <p></p>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger">Delete</button>
+          <button type="button" class="btn btn-warning">Untag User</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 
   <!-- Latest compiled and minified JavaScript -->
   <script
