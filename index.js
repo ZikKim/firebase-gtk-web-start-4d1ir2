@@ -110,7 +110,7 @@ function main() {
                 firebase.firestore().collection("users").doc(doc.id).update({"cardNo":""});
                 console.log("Untagging User :  "  + doc.data().email + " " + doc.data().name);
               })});
-              
+
               //Release library card is ready!              
               firebase.firestore().collection("libraryCards").doc().set({
                 "cardNo": doc.data().cardNo,
@@ -276,7 +276,7 @@ function LibCard() {
             }          
           }          
         }
-        //alert( 'You clicked on '+data[0]+'\'s row' );
+        //alert( 'You clicked on '+data[0]+'\'s row' ); xxxxxxxxx
       });
 
       $("#dtFirebase tr").css("cursor", "pointer");
@@ -287,12 +287,7 @@ function Users() {
   var arrData = new Array();
   var iLoop = 0;
   var tmpObj;
-  firebase
-    .firestore()
-    .collection("users")
-    .orderBy("dateCreated", "desc")
-    .limit(10)
-    .onSnapshot(snaps => {
+  firebase.firestore().collection("users").orderBy("dateCreated", "asc").limit(10).onSnapshot(snaps => {
       snaps.forEach(doc => {
         arrData[iLoop] = new Array(
           doc.id,
