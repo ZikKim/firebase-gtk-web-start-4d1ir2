@@ -295,7 +295,8 @@ function LibCard() {
           { title: "Untag" }
         ],
         order: [[1, "desc"]],
-        pageLength: 50
+        pageLength: 50,
+        destroy: true
       });
 
       $("#dtFirebase tbody").on("click", "tr", function() {
@@ -367,7 +368,8 @@ function Users() {
             visible: false,
             searchable: false
           }
-        ]
+        ],
+        destroy: true
       });
 
       $("#dtFirebase tbody").on("click", "tr", function() {
