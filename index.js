@@ -69,51 +69,25 @@ async function main() {
     }
   });
 
-  btnFilter.addEventListener("click", e => {
+  btnUserDelete.addEventListener("click", e => {
     e.preventDefault();
-    var mode = findGetParameter("mode");
-    if (mode == "latest") {
-      //Latest($("#search_keyword").val());
-      Latest();
-    }
-    if (mode == "libcard") {
-      //LibCard($("#search_keyword").val());
-      LibCard();
-    }
+    if(confirm('Are you sure proceed to DELETE ? ')){
+      alert('deleted!');
+      
+      /*firebase
+      .firestore()
+      .collection("users")
+      .add({
+        text: input.value,
+        timestamp: Date.now(),
+        name: firebase.auth().currentUser.displayName,
+        userId: firebase.auth().currentUser.uid
+      });*/
+
+    }    
     return false;
   });
 
-  btnOlder.addEventListener("click", e => {
-    e.preventDefault();
-    var mode = findGetParameter("mode");
-
-    if (localStorage.getItem("sortOrder") === "desc") {
-      localStorage.setItem("sortOrder", "asc");
-    } else {
-      localStorage.setItem("sortOrder", "desc");
-    }
-
-    if (mode == "latest") {
-      dtExample();
-      //Latest($("#search_keyword").val());
-    }
-    if (mode == "libcard") {
-      LibCard($("#search_keyword").val());
-    }
-    return false;
-  });
-
-  frmSearch.addEventListener("submit", e => {
-    /*var mode = findGetParameter("mode");
-    e.preventDefault();
-    if (mode == "latest") {
-      Latest($("#search_keyword").val());
-    }
-    if (mode == "libcard") {
-      LibCard($("#search_keyword").val());
-    }
-    return false;*/
-  });
 
   // Listen to the current Auth state
   firebase.auth().onAuthStateChanged(user => {
@@ -125,7 +99,7 @@ async function main() {
       btnLogin.textContent = "Log In";
       menusContainer.style.display = "none";
       dataTable.style.display = "none";
-      Search.style.display = "none";
+      //Search.style.display = "none";
 
       //master@celex.com.my
       // Unsubscribe
@@ -171,7 +145,7 @@ function ModeSelection() {
   //console.log();
   switch (mode) {
     case "latest":
-      Latest();
+      Users();
       break;
     case "libcard":
       LibCard();
@@ -209,6 +183,7 @@ function LibCard() {
     .firestore()
     .collection("libraryCards")
     .orderBy("no", "desc")
+    .limit(10)
     .onSnapshot(snaps => {
       snaps.forEach(doc => {
         arrData[iLoop] = new Array(
@@ -238,13 +213,13 @@ function LibCard() {
     });
 }
 
-function Latest() {
+function Users() {
   var arrData = new Array();
   var iLoop = 0;
   latestActivitiesListener = firebase
     .firestore()
     .collection("users")
-    .orderBy("dateCreated", "desc")
+    .limit(10)
     .onSnapshot(snaps => {
       snaps.forEach(doc => {
         arrData[iLoop] = new Array(
@@ -286,6 +261,7 @@ function Latest() {
       
     });
 }
+
 
 function fbDataCheck(node) {
   if (typeof node !== "undefined") {

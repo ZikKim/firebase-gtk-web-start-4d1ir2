@@ -79,7 +79,7 @@
       <div align="center" width="100%">PPAS Administrator</div>
     </section>
 
-    <section id="Search" style="display:none">
+    <!-- section id="Search" style="display:none">
       <form id="frmSearch">
         <div width="100%" align="left" style="font-size:15px;">
           Search Keywords
@@ -99,7 +99,7 @@
           </button>
         </div>
       </form>
-    </section>
+    </section -->
 
     <section id="dataTable" style="font-size:11px;">
       <table id="dtFirebase" class="stripe" width="100%"></table>
@@ -121,10 +121,9 @@
           <p><span>Library Card Number : </span> <span id="UserModalCardNo">...</a></p>
           <p><span>User Registered Email : </span> <span id="UserModalEmail">...</a></p>
           <p></p>
-
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger">Delete</button>
+          <button type="button" class="btn btn-danger" id="btnUserDelete">Delete</button>
           <button type="button" class="btn btn-warning">Deassign</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
@@ -159,7 +158,11 @@
   </div>
 
 
-
+  <script>
+    function UserModalDelete() {
+      alert('clicked');
+    }
+  </script>
   <!-- Latest compiled and minified JavaScript -->
   <script
     src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
