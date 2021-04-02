@@ -97,10 +97,29 @@ function main() {
           if (doc.exists) {
             //console.log("Document data:", doc.data());
             //unTag exist card usage mage
-            firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val())
+            if(!doc.data().untag) {
+
+              firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val())
               .update({
                 "untag": true
               });
+
+              console.log('untaged:  ' + doc.data().no + ' ' + doc.data().cardNo + ' ' + doc.data().email);
+              //Get the hightest no data
+              var lastLib = firebase.firesotre().collection("libraryCards").orderBy("no","desc").limitToLast(1);
+              console.log(lastLib.data().no);
+              /*
+              //Release library card is ready!
+              firebase.firestore().collection("libraryCards").doc().add({
+                "cardNo": doc.data().cardNo,
+                "emai": "",
+                "no": doc.data().no + 1
+              });*/
+
+            } else {
+              console.log('already untaged document');
+            }
+            
             
 
           } else {
@@ -325,7 +344,7 @@ function fbDataCheck(node) {
   if (typeof node !== "undefined") {
     return node;
   } else {
-    return "n/a";
+    return "";
   }
 }
 
