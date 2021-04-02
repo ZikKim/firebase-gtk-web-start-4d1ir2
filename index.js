@@ -296,7 +296,7 @@ function LibCard() {
         ],
         order: [[1, "desc"]],
         pageLength: 50,
-        destroy: true
+        bDestroy: true
       });
 
       $("#dtFirebase tbody").on("click", "tr", function() {
