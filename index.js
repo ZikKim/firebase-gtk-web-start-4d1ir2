@@ -63,6 +63,26 @@ function main() {
     }
   });
 
+  // Listen to the current Auth state
+  firebase.auth().onAuthStateChanged(user => {
+    if (user) {
+      btnLogin.textContent = "Log Out";
+      menusContainer.style.display = "block";
+      ModeSelection();
+    } else {
+      btnLogin.textContent = "Log In";
+      menusContainer.style.display = "none";
+      dataTable.style.display = "none";
+      //Search.style.display = "none";
+
+      //master@celex.com.my
+      // Unsubscribe
+      //unsubscribeGuestbook();
+    }
+  });
+
+
+
   //Event Handelers for UserModal Windows ===============================>
   btnUserDelete.addEventListener("click", e => {
     e.preventDefault();
@@ -145,39 +165,14 @@ function main() {
           console.log("Error getting document:", error);
           return false;
         });
-
-      /*
-        .set([
-          untag => true
-        ]).then(() => {          
-          $("#UserModal").modal("toggle");
-          console.log("Document successfully unTag!");
-        })
-        .catch(error => {
-          alert("Error removing document: ", error);
-          console.error("Error untagging document: ", error);
-        });*/
     }
     return false;
   });
+} // and 'async main' function
 
-  // Listen to the current Auth state
-  firebase.auth().onAuthStateChanged(user => {
-    if (user) {
-      btnLogin.textContent = "Log Out";
-      menusContainer.style.display = "block";
-      ModeSelection();
-    } else {
-      btnLogin.textContent = "Log In";
-      menusContainer.style.display = "none";
-      dataTable.style.display = "none";
-      //Search.style.display = "none";
 
-      //master@celex.com.my
-      // Unsubscribe
-      //unsubscribeGuestbook();
-    }
-  });
+function Welcome() {
+  WelcomeSec.style.display = "block";
 }
 
 function ModeSelection() {
@@ -189,10 +184,6 @@ function ModeSelection() {
     case "import":  Import(); break;
     default:        Welcome();
   }
-}
-
-function Welcome() {
-  WelcomeSec.style.display = "block";
 }
 
 function findGetParameter(parameterName) {
@@ -380,5 +371,7 @@ function firebaseTime(fbTime) {
 }
 
 function Import() {}
+
+
 
 main();
