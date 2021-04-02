@@ -8,13 +8,11 @@
     integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
     crossorigin="anonymous"
   />
-
   <link
     type="text/css"
     rel="stylesheet"
     href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css"
   />
-
   <link
     type="text/css"
     rel="stylesheet"
@@ -45,34 +43,17 @@
 
     <section id="menus-container" style="display:none;">
       <div align="center">
-        <label id="btnLatest"
-          ><a href="?mode=latest">Latest Activities</a></label
-        >
-        &nbsp;&nbsp;&nbsp;&nbsp;
+        <label id="btnLatest"><a href="?mode=latest">Latest Activities</a></label>
+        &nbsp;&nbsp;|&nbsp;&nbsp;
         <label id="btnLibCard"><a href="?mode=libcard">Library Cards</a></label>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <label id="btnImport"
-          ><a href="?mode=import">Import Library Cards</a></label
-        >
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <label id="btnImport"><a href="?mode=import">Import Library Cards</a></label>
       </div>
     </section>
 
     <hr />
 
     <section id="firebaseui-auth-container"></section>
-
-    <!-- section id="guestbook-container">
-      <h2>Discussion</h2>
-
-      <form id="leave-message">
-        <label>Leave a message: </label>
-        <input type="text" id="message" />
-        <button type="submit">
-          <i class="material-icons">send</i>
-          <span>SEND</span>
-        </button>
-      </form>
-    </section -->
 
     <section id="WelcomeSec" style="font-size:16px; display:none">
       <br /><br /><br /><br />
@@ -103,6 +84,14 @@
 
     <section id="dataTable" style="font-size:11px;">
       <table id="dtFirebase" class="stripe" width="100%"></table>
+    </section>
+
+    <section id="ImportSec" style="display:none">
+      <p style="text-align:center">Please copy and paste Library Card number here</p>
+      <p style="text-align:center">use comma [,] for separation  </p>
+
+      <textarea id="txtNewCards" rows="20" cols="80"> </textarea>
+      <p style="text-align:center"> <button id="btnImport" class="btn btn-success"> Start Import </button></p>
     </section>
   </div>
 
