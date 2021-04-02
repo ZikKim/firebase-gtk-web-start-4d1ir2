@@ -19,9 +19,9 @@ const frmSearch = document.getElementById("frmSearch");
 //var sortOrder = "desc";
 var tbFirebaseRowIndex = -1;
 var tableFirebase;
-var NextLibCardNo = 0;
+var nextLibCardNo = 0;
 
-function main() {
+async function main() {
   // Add Firebase project configuration object here
   const firebaseConfig = {
     apiKey: "AIzaSyAYoBv6FJOO1kBkpabZjodZQJKacnWK11w",
@@ -81,11 +81,20 @@ function main() {
     }
   });
 
+  var fbRef = firebase.firestore().collection('libraryCards');
+  var fbDoc = await fbRef.orderBy("no","desc").limit(1).get();
+  fbDoc.forEach(doc => {
+    nextLibCardNo = doc.data().no + 1;
+  });
 
-
+  console.log('The next Lib cards number is : ' + nextLibCardNo);
+  
   //Event Handelers for UserModal Windows ===============================>
   btnUserDelete.addEventListener("click", e => {
     e.preventDefault();
+
+    console.log(nextLibCardNo);
+
     if (confirm("Are you sure proceed to DELETE and Untag ? ")) {
       //alert($('#UserModalDocId').val());
       firebase.firestore().collection("users").doc($("#UserModalDocId").val()).delete().then(() => {
@@ -100,6 +109,21 @@ function main() {
               //Remark untagging on untag field as boolean
               firebase.firestore().collection("libraryCards").doc(doc.id).update({"untag": true});
               console.log("Untagging User :  "  + doc.data().email + " " + doc.data().cardNo);
+
+              //Release library card is ready!  == REBUILD ==
+              firebase.firestore().collection("libraryCards").doc().set({
+                "cardNo": doc.data().cardNo,
+                "email": "",
+                "no": nextLibCardNo
+              }).then(() => {
+                console.log("Added & Rebuild LibCard successfully written!" + doc.data().cardNo + ' ' + nextLibCardNo);
+              })
+              .catch((error) => {
+                console.error("Error Rebuild libraryCards: ", error);
+              });
+              
+              //Increase CardNo in case multiple untagging
+              nextLibCardNo = nextLibCardNo +1;
 
             })
           });
@@ -145,7 +169,7 @@ function main() {
               firebase.firestore().collection("libraryCards").doc().set({
                 "cardNo": doc.data().cardNo,
                 "email": "",
-                "no": NextLibCardNo
+                "no": nextLibCardNo
               }).then(() => {
                 console.log("Added & Rebuild LibCard successfully written!");
               })
@@ -169,7 +193,6 @@ function main() {
     return false;
   });
 } // and 'async main' function
-
 
 function Welcome() {
   WelcomeSec.style.display = "block";
@@ -202,12 +225,8 @@ function findGetParameter(parameterName) {
 function LibCard() {
   var arrData = new Array();
   var iLoop = 0;
-  firebase.firestore().collection("libraryCards").orderBy("no", "desc").limit(10).onSnapshot(snaps => {
-      snaps.forEach(doc => {
-        if (NextLibCardNo == 0) {
-          NextLibCardNo = doc.data().no+1;
-          console.log("MaxCardNo.:" + NextLibCardNo);
-        }
+  firebase.firestore().collection("libraryCards").orderBy("no", "desc").onSnapshot(snaps => {
+      snaps.forEach(doc => {        
         arrData[iLoop] = new Array(
           doc.id,
           fbDataCheck(doc.data().no),
@@ -266,7 +285,7 @@ function Users() {
   var arrData = new Array();
   var iLoop = 0;
   var tmpObj;
-  firebase.firestore().collection("users").orderBy("dateCreated", "asc").limit(10).onSnapshot(snaps => {
+  firebase.firestore().collection("users").orderBy("dateCreated", "asc").onSnapshot(snaps => {
       snaps.forEach(doc => {
         arrData[iLoop] = new Array(
           doc.id,
