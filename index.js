@@ -19,6 +19,7 @@ const frmSearch = document.getElementById("frmSearch");
 //var sortOrder = "desc";
 var tbFirebaseRowIndex = -1;
 var tableFirebase;
+var NextLibCardNo = 0;
 
 function main() {
   // Add Firebase project configuration object here
@@ -92,36 +93,32 @@ function main() {
   btnLibUntag.addEventListener("click", e => {
     e.preventDefault();
     if (confirm("Are you sure proceed to Untag ? ")) {
-      firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val()).get()
-        .then(doc => {
+
+      firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val()).get().then(doc => {
           if (doc.exists) {
             //console.log("Document data:", doc.data());
             //unTag exist card usage mage
-            if(!doc.data().untag) {
+            if (!doc.data().untag) {
+              firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val()).update({
+                  untag: true
+                });
+              console.log("untaged:  " +doc.data().no +" " +doc.data().cardNo +" " +doc.data().email);
 
-              firebase.firestore().collection("libraryCards").doc($("#LibModalDocId").val())
-              .update({
-                "untag": true
+              //Release library card is ready!
+              firebase.firestore().collection("libraryCards").doc().set({
+                "cardNo": doc.data().cardNo,
+                "email": "",
+                "no": NextLibCardNo
+              }).then(() => {
+                console.log("Added & Rebuild LibCard successfully written!");
+              })
+              .catch((error) => {
+                console.error("Error Rebuild libraryCards: ", error);
               });
 
-              console.log('untaged:  ' + doc.data().no + ' ' + doc.data().cardNo + ' ' + doc.data().email);
-              //Get the hightest no data
-              var lastLib = firebase.firesotre().collection("libraryCards").orderBy("no","desc").limitToLast(1);
-              console.log(lastLib.data().no);
-              /*
-              //Release library card is ready!
-              firebase.firestore().collection("libraryCards").doc().add({
-                "cardNo": doc.data().cardNo,
-                "emai": "",
-                "no": doc.data().no + 1
-              });*/
-
             } else {
-              console.log('already untaged document');
+              console.log("already untaged document");
             }
-            
-            
-
           } else {
             // doc.data() will be undefined in this case
             console.log("No such document!");
@@ -221,12 +218,16 @@ function LibCard() {
     .limit(10)
     .onSnapshot(snaps => {
       snaps.forEach(doc => {
+        if (NextLibCardNo == 0) {
+          NextLibCardNo = doc.data().no+1;
+          console.log("MaxCardNo.:" + NextLibCardNo);
+        }
         arrData[iLoop] = new Array(
           doc.id,
           fbDataCheck(doc.data().no),
           fbDataCheck(doc.data().cardNo),
           fbDataCheck(doc.data().email),
-          fbDataCheck(doc.data().untag),
+          fbDataCheck(doc.data().untag)
         );
         iLoop++;
         //Search.style.display = "block";
@@ -254,12 +255,19 @@ function LibCard() {
         } else {
           tableFirebase.$("tr.selected").removeClass("selected");
           $(this).addClass("selected");
-
-          tbFirebaseRowIndex = tr.index();
-          $("#LibModal").modal("show");
-          $("#LibModalDocId").val(data[0]);
-          $("#LibModalCardNo").html(data[2]);
-          $("#LibModalEmail").html(data[3]);          
+          if(data[3]=='') {
+            alert('No user tagged on this Library Card');
+          } else {
+            if(data[4]){
+              alert('This Library Card record is revoked');
+            } else {
+              tbFirebaseRowIndex = tr.index();
+              $("#LibModal").modal("show");
+              $("#LibModalDocId").val(data[0]);
+              $("#LibModalCardNo").html(data[2]);
+              $("#LibModalEmail").html(data[3]);
+            }          
+          }          
         }
         //alert( 'You clicked on '+data[0]+'\'s row' );
       });
