@@ -240,135 +240,128 @@ function findGetParameter(parameterName) {
 }
 
 function LibCard() {
-  var arrData = new Array();
+  var dataSet = new Array();
   var iLoop = 0;
 
-  DatatableSec.style.display = "block";
-  
-  firebase.firestore().collection("libraryCards").orderBy("no", "desc").onSnapshot(snaps => {
-      snaps.forEach(doc => {
-        arrData[iLoop] = new Array(
-          doc.id,
-          fbDataCheck(doc.data().no),
-          fbDataCheck(doc.data().cardNo),
-          fbDataCheck(doc.data().email),
-          fbDataCheck(doc.data().untag)
-        );
-        iLoop++;
-        //Search.style.display = "block";
-      });
-
-      tableFirebase = $("#dtFirebase").DataTable({
-        data: arrData,
-        columns: [
-          { title: "Doc Id" },
-          { title: "No." },
-          { title: "Card No." },
-          { title: "Email" },
-          { title: "Untag" }
-        ],
-        order: [[1, "desc"]],
-        pageLength: 50,
-        destroy: true
-      });
-
-      $("#dtFirebase tbody").on("click", "tr", function() {
-        var data = tableFirebase.row(this).data();
-        var tr = $(this).closest("tr");
-
-        if ($(this).hasClass("selected")) {
-          $(this).removeClass("selected");
-        } else {
-          tableFirebase.$("tr.selected").removeClass("selected");
-          $(this).addClass("selected");
-          if (data[4]) {
-            alert("This Library Card record is revoked");
-          } else {
-            tbFirebaseRowIndex = tr.index();
-            $("#LibModal").modal("show");
-            $("#LibModalDocId").val(data[0]);
-            $("#LibModalCardNo").html(data[2]);
-            $("#LibModalEmail").html(data[3]);
-          }
-          /*if (data[3] == "") {
-            alert("No user tagged on this Library Card");
-          } else {            
-          }*/
-        }
-      });
-      $("#dtFirebase tr").css("cursor", "pointer");
+  DatatableSec.style.display = "block";  
+  firebase.firestore().collection("libraryCards").orderBy("no", "desc").get().then(snaps => {
+    snaps.forEach(doc => {
+      dataSet[iLoop] = new Array(
+        doc.id,
+        fbDataCheck(doc.data().no),
+        fbDataCheck(doc.data().cardNo),
+        fbDataCheck(doc.data().email),
+        fbDataCheck(doc.data().untag)
+      );
+      iLoop++;
+      //Search.style.display = "block";
     });
+
+    tableFirebase = $("#dtFirebase").DataTable({
+      data: dataSet,
+      columns: [
+        { title: "Doc Id" },
+        { title: "No." },
+        { title: "Card No." },
+        { title: "Email" },
+        { title: "Untag" }
+      ],
+      order: [[1, "desc"]],
+      pageLength: 50,
+    });
+
+    $("#dtFirebase tbody").on("click", "tr", function() {
+      var data = tableFirebase.row(this).data();
+      var tr = $(this).closest("tr");
+
+      if ($(this).hasClass("selected")) {
+        $(this).removeClass("selected");
+      } else {
+        tableFirebase.$("tr.selected").removeClass("selected");
+        $(this).addClass("selected");
+        if (data[4]) {
+          alert("This Library Card record is revoked");
+        } else {
+          tbFirebaseRowIndex = tr.index();
+          $("#LibModal").modal("show");
+          $("#LibModalDocId").val(data[0]);
+          $("#LibModalCardNo").html(data[2]);
+          $("#LibModalEmail").html(data[3]);
+        }
+        /*if (data[3] == "") {
+          alert("No user tagged on this Library Card");
+        } else {            
+        }*/
+      }
+    });
+    $("#dtFirebase tr").css("cursor", "pointer");
+  });
 }
 
 function Users() {
-  var arrData = new Array();
   var iLoop = 0;
-  var tmpObj;
-
+  var dataSet = new Array();
   DatatableSec.style.display = "block";
 
-  firebase.firestore().collection("users").orderBy("dateCreated", "asc").onSnapshot(snaps => {
-      snaps.forEach(doc => {
-        arrData[iLoop] = new Array(
-          doc.id,
-          fbDataCheck(doc.data().name),
-          fbDataCheck(doc.data().cardNo),
-          fbDataCheck(doc.data().email),
-          fbDataCheck(doc.data().gender),
-          fbDataCheck(doc.data().icNo),
-          firebaseTime(doc.data().dateCreated)
-        );
-        iLoop++;
-      });
-
-      tableFirebase = $("#dtFirebase").DataTable({
-        data: arrData,
-        columns: [
-          { title: "Doc Id" },
-          { title: "Name" },
-          { title: "Card No." },
-          { title: "Email" },
-          { title: "Gender" },
-          { title: "IC No." },
-          { title: "Created" }
-        ],
-        order: [[6, "desc"]],
-        pageLength: 50,
-        columnDefs: [
-          {
-            targets: [0],
-            visible: false,
-            searchable: false
-          }
-        ]
-      });
-
-      $("#dtFirebase tbody").on("click", "tr", function() {
-        var data = tableFirebase.row(this).data();
-        var tr = $(this).closest("tr");
-
-        if ($(this).hasClass("selected")) {
-          $(this).removeClass("selected");
-        } else {
-          tableFirebase.$("tr.selected").removeClass("selected");
-          $(this).addClass("selected");
-
-          tbFirebaseRowIndex = tr.index();
-          $("#UserModal").modal("show");
-          $("#UserModalDocId").val(data[0]); // document id. hidden from table
-          $("#UserModalName").html(data[1]);
-          $("#UserModalCardNo").html(data[2]);
-          $("#UserModalEmail").html(data[3]);
-
-          $("#UserModalTagedCardNo").val(data[2]);
-          $("#UserModalTagedEmail").val(data[3]);
-        }
-
-        //alert( 'You clicked on '+data[0]+'\'s row' );
-      });
-
-      $("#dtFirebase tr").css("cursor", "pointer");
+  firebase.firestore().collection("users").orderBy("dateCreated", "asc").get().then(snaps => {
+    snaps.forEach(doc => {
+      dataSet[iLoop] = new Array(
+        doc.id,
+        fbDataCheck(doc.data().name),
+        fbDataCheck(doc.data().cardNo),
+        fbDataCheck(doc.data().email),
+        fbDataCheck(doc.data().gender),
+        fbDataCheck(doc.data().icNo),
+        firebaseTime(doc.data().dateCreated)
+      );
+      iLoop++;
     });
+    console.log('1');
+    tableFirebase = $("#dtFirebase").DataTable({
+      data: dataSet,
+      columns: [
+        { title: "Doc Id" },
+        { title: "Name" },
+        { title: "Card No." },
+        { title: "Email" },
+        { title: "Gender" },
+        { title: "IC No." },
+        { title: "Created" }
+      ],
+      order: [[6, "desc"]],
+      pageLength: 50,
+      columnDefs: [
+        {
+          targets: [0],
+          visible: false,
+          searchable: false
+        }
+      ]
+    });
+    $("#dtFirebase tbody").on("click", "tr", function() {
+      var data = tableFirebase.row(this).data();
+      var tr = $(this).closest("tr");
+
+      if ($(this).hasClass("selected")) {
+        $(this).removeClass("selected");
+      } else {
+        tableFirebase.$("tr.selected").removeClass("selected");
+        $(this).addClass("selected");
+
+        tbFirebaseRowIndex = tr.index();
+        $("#UserModal").modal("show");
+        $("#UserModalDocId").val(data[0]); // document id. hidden from table
+        $("#UserModalName").html(data[1]);
+        $("#UserModalCardNo").html(data[2]);
+        $("#UserModalEmail").html(data[3]);
+
+        $("#UserModalTagedCardNo").val(data[2]);
+        $("#UserModalTagedEmail").val(data[3]);
+      }
+    });
+    $("#dtFirebase tr").css("cursor", "pointer");
+  });
+    
 }
 
 function fbDataCheck(node) {
