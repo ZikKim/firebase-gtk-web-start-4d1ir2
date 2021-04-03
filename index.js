@@ -125,7 +125,6 @@ async function main() {
           }
           nextLibCardNo++;
 
-
           // Deletion apply to the DataTables
           tableFirebase.row(".selected").remove().draw(false);
           $("#UserModal").modal("toggle");
@@ -309,19 +308,19 @@ function LibCard() {
         } else {
           tableFirebase.$("tr.selected").removeClass("selected");
           $(this).addClass("selected");
-          if (data[3] == "") {
-            alert("No user tagged on this Library Card");
+          if (data[4]) {
+            alert("This Library Card record is revoked");
           } else {
-            if (data[4]) {
-              alert("This Library Card record is revoked");
-            } else {
-              tbFirebaseRowIndex = tr.index();
-              $("#LibModal").modal("show");
-              $("#LibModalDocId").val(data[0]);
-              $("#LibModalCardNo").html(data[2]);
-              $("#LibModalEmail").html(data[3]);
-            }
+            tbFirebaseRowIndex = tr.index();
+            $("#LibModal").modal("show");
+            $("#LibModalDocId").val(data[0]);
+            $("#LibModalCardNo").html(data[2]);
+            $("#LibModalEmail").html(data[3]);
           }
+          /*if (data[3] == "") {
+            alert("No user tagged on this Library Card");
+          } else {            
+          }*/
         }
         //alert( 'You clicked on '+data[0]+'\'s row' ); xxxxxxxxx
       });
