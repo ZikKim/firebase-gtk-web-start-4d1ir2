@@ -223,10 +223,11 @@ function ModeSelection() {
   var url = document.location.href;
   var mode = findGetParameter("mode");
   switch (mode) { 
-    case "latest":  Users(); break;
-    case "libcard": LibCard(); break;
-    case "import":  Import(); break;
-    default:        Welcome();
+    case "latest"   : Users();    break;
+    case "libcard"  : LibCard();  break;
+    case "import"   : Import();   break;
+    case "static"   : Statics();  break;
+    default         : Welcome();  
   }
 }
 
@@ -240,69 +241,49 @@ function findGetParameter(param) {
   return result;
 }
 
-function LibCard() {
-  var dataSet = new Array();
-  var iLoop = 0;
+function fbDataCheck(node) {
+  if (typeof node !== "undefined") {
+    return node;
+  } else {
+    return "";
+  }
+}
 
-  DatatableSec.style.display = "block";  
-  firebase.firestore().collection("libraryCards").orderBy("no", "desc").get().then(snaps => {
-    snaps.forEach(doc => {
-      dataSet[iLoop] = new Array(
-        doc.id,
-        fbDataCheck(doc.data().no),
-        fbDataCheck(doc.data().cardNo),
-        fbDataCheck(doc.data().email),
-        fbDataCheck(doc.data().untag)
-      );
-      iLoop++;
-      //Search.style.display = "block";
-    });
+function firebaseTime(fbTime) {
+  if (typeof fbTime !== "undefined") {
+    var d = new Date(fbTime.seconds * 1000), // Convert the passed timestamp to milliseconds
+      yyyy = d.getFullYear(),
+      mm = ("0" + (d.getMonth() + 1)).slice(-2), // Months are zero based. Add leading 0.
+      dd = ("0" + d.getDate()).slice(-2), // Add leading 0.
+      hh = d.getHours(),
+      h = hh,
+      min = ("0" + d.getMinutes()).slice(-2), // Add leading 0.
+      ampm = "AM",
+      time;
 
-    tableFirebase = $("#dtFirebase").DataTable({
-      data: dataSet,
-      columns: [
-        { title: "Doc Id" },
-        { title: "No." },
-        { title: "Card No." },
-        { title: "Email" },
-        { title: "Untag" }
-      ],
-      order: [[1, "desc"]],
-      pageLength: 50,
-    });
+    if (hh > 12) {
+      h = hh - 12;
+      ampm = "PM";
+    } else if (hh === 12) {
+      h = 12;
+      ampm = "PM";
+    } else if (hh == 0) {
+      h = 12;
+    }
 
-    $("#dtFirebase tbody").on("click", "tr", function() {
-      var data = tableFirebase.row(this).data();
-      var tr = $(this).closest("tr");
-
-      if ($(this).hasClass("selected")) {
-        $(this).removeClass("selected");
-      } else {
-        tableFirebase.$("tr.selected").removeClass("selected");
-        $(this).addClass("selected");
-        if (data[4]) {
-          alert("This Library Card record is revoked");
-        } else {
-          tbFirebaseRowIndex = tr.index();
-          $("#LibModal").modal("show");
-          $("#LibModalDocId").val(data[0]);
-          $("#LibModalCardNo").html(data[2]);
-          $("#LibModalEmail").html(data[3]);
-        }
-        /*if (data[3] == "") {
-          alert("No user tagged on this Library Card");
-        } else {            
-        }*/
-      }
-    });
-    $("#dtFirebase tr").css("cursor", "pointer");
-  });
+    // ie: 2014-03-24, 3:00 PM
+    time = yyyy + "-" + mm + "-" + dd + ", " + h + ":" + min + " " + ampm;
+    return time;
+  } else {
+    return "";
+  }
 }
 
 function Users() {
   var iLoop = 0;
   var dataSet = new Array();
   DatatableSec.style.display = "block";
+  $('#btnLatest').css({"box-shadow":"inset 0 -2px 0 #2980B9", "line-height":"20px"});
 
   firebase.firestore().collection("users").orderBy("dateCreated", "asc").get().then(snaps => {
     snaps.forEach(doc => {
@@ -361,50 +342,78 @@ function Users() {
       }
     });
     $("#dtFirebase tr").css("cursor", "pointer");
+  });    
+}
+
+function LibCard() {
+  var dataSet = new Array();
+  var iLoop = 0;
+  DatatableSec.style.display = "block";  
+  $('#btnLibCard').css({"box-shadow":"inset 0 -2px 0 #2980B9", "line-height":"20px"});
+
+  firebase.firestore().collection("libraryCards").orderBy("no", "desc").get().then(snaps => {
+    snaps.forEach(doc => {
+      dataSet[iLoop] = new Array(
+        doc.id,
+        fbDataCheck(doc.data().no),
+        fbDataCheck(doc.data().cardNo),
+        fbDataCheck(doc.data().email),
+        fbDataCheck(doc.data().untag)
+      );
+      iLoop++;
+      //Search.style.display = "block";
+    });
+
+    tableFirebase = $("#dtFirebase").DataTable({
+      data: dataSet,
+      columns: [
+        { title: "Doc Id" },
+        { title: "No." },
+        { title: "Card No." },
+        { title: "Email" },
+        { title: "Untag" }
+      ],
+      order: [[1, "desc"]],
+      pageLength: 50,
+    });
+
+    $("#dtFirebase tbody").on("click", "tr", function() {
+      var data = tableFirebase.row(this).data();
+      var tr = $(this).closest("tr");
+
+      if ($(this).hasClass("selected")) {
+        $(this).removeClass("selected");
+      } else {
+        tableFirebase.$("tr.selected").removeClass("selected");
+        $(this).addClass("selected");
+        if (data[4]) {
+          alert("This Library Card record is revoked");
+        } else {
+          tbFirebaseRowIndex = tr.index();
+          $("#LibModal").modal("show");
+          $("#LibModalDocId").val(data[0]);
+          $("#LibModalCardNo").html(data[2]);
+          $("#LibModalEmail").html(data[3]);
+        }
+        /*if (data[3] == "") {
+          alert("No user tagged on this Library Card");
+        } else {            
+        }*/
+      }
+    });
+    $("#dtFirebase tr").css("cursor", "pointer");
   });
-    
-}
-
-function fbDataCheck(node) {
-  if (typeof node !== "undefined") {
-    return node;
-  } else {
-    return "";
-  }
-}
-
-function firebaseTime(fbTime) {
-  if (typeof fbTime !== "undefined") {
-    var d = new Date(fbTime.seconds * 1000), // Convert the passed timestamp to milliseconds
-      yyyy = d.getFullYear(),
-      mm = ("0" + (d.getMonth() + 1)).slice(-2), // Months are zero based. Add leading 0.
-      dd = ("0" + d.getDate()).slice(-2), // Add leading 0.
-      hh = d.getHours(),
-      h = hh,
-      min = ("0" + d.getMinutes()).slice(-2), // Add leading 0.
-      ampm = "AM",
-      time;
-
-    if (hh > 12) {
-      h = hh - 12;
-      ampm = "PM";
-    } else if (hh === 12) {
-      h = 12;
-      ampm = "PM";
-    } else if (hh == 0) {
-      h = 12;
-    }
-
-    // ie: 2014-03-24, 3:00 PM
-    time = yyyy + "-" + mm + "-" + dd + ", " + h + ":" + min + " " + ampm;
-    return time;
-  } else {
-    return "";
-  }
 }
 
 function Import() {
   ImportSec.style.display = "block";
+  $('#btnImport').css({"box-shadow":"inset 0 -2px 0 #2980B9", "line-height":"20px"});
 }
+
+function Statics() {
+  StaticsSec.style.display = "block";
+  $('#btnStatics').css({"box-shadow":"inset 0 -2px 0 #2980B9", "line-height":"20px"});
+}
+
 
 main();
