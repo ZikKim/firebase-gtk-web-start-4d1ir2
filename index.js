@@ -2,21 +2,11 @@
 import "./style.css";
 // Firebase App (the core Firebase SDK) is always required and must be listed first
 import firebase from "firebase/app";
-
 // Add the Firebase products that you want to use
 import "firebase/auth";
 import "firebase/firestore";
-
 import * as firebaseui from "firebaseui";
 
-// Document elements
-const btnLogin = document.getElementById("btnLogin");
-const btnEdit = document.getElementById("btnEdit");
-//const userContainer = document.getElementById("user-container");
-const menusContainer = document.getElementById("menus-container");
-const frmSearch = document.getElementById("frmSearch");
-
-//var sortOrder = "desc";
 var tbFirebaseRowIndex = -1;
 var tableFirebase;
 var nextLibCardNo = 0;
@@ -65,18 +55,19 @@ async function main() {
   // Listen to the current Auth state
   firebase.auth().onAuthStateChanged(user => {
     if (user) {
-      btnLogin.textContent = "Log Out";
-      menusContainer.style.display = "block";
-      ModeSelection();
+      console.log(user.email);      
+      firebase.firestore().collection("permit").where( "identifier", "==", user.email ).get().then(snapshot => {
+        if(snapshot.size) {
+          btnLogin.textContent = "Log Out";
+          MenuSec.style.display = "block";
+          ModeSelection();
+        }
+      });
     } else {
       btnLogin.textContent = "Log In";
-      menusContainer.style.display = "none";
-      dataTable.style.display = "none";
-      //Search.style.display = "none";
-
-      //master@celex.com.my
-      // Unsubscribe
-      //unsubscribeGuestbook();
+      MenuSec.style.display = "none";
+      DatatableSec.style.display = "none";
+      ImportSec.style.display = "none";
     }
   });
 
@@ -191,6 +182,7 @@ async function main() {
     return false;
   });
 
+  //Data Import
   btnImportCards.addEventListener("click", e => {
     e.preventDefault();
     var newCards = $.trim($('#txtNewCards').val());
@@ -214,20 +206,6 @@ async function main() {
           nextLibCardNo++;
         });
 
-        //var jsonObj = JSON.stringify(arrData);
-        //console.log(arrData);
-        //console.log(jsonObj);
-        //return false;
-
-        /*firebase.firestore().collection('libraryCards').doc().set(arrData).then(() => {
-          console.log("Imported Data Successfully");
-          alert('Imported Data Successfully!');
-        })
-        .catch(error => {
-          console.error("Error Import Library Card Data: ", error);
-        });*/
-
-
       } // if confirm
     }
     return false;
@@ -243,18 +221,11 @@ function Welcome() {
 function ModeSelection() {
   var url = document.location.href;
   var mode = findGetParameter("mode");
-  switch (mode) {
-    case "latest":
-      Users();
-      break;
-    case "libcard":
-      LibCard();
-      break;
-    case "import":
-      Import();
-      break;
-    default:
-      Welcome();
+  switch (mode) { 
+    case "latest":  Users(); break;
+    case "libcard": LibCard(); break;
+    case "import":  Import(); break;
+    default:        Welcome();
   }
 }
 
@@ -271,6 +242,8 @@ function findGetParameter(parameterName) {
 function LibCard() {
   var arrData = new Array();
   var iLoop = 0;
+
+  DatatableSec.style.display = "block";
   
   firebase.firestore().collection("libraryCards").orderBy("no", "desc").onSnapshot(snaps => {
       snaps.forEach(doc => {
@@ -322,18 +295,18 @@ function LibCard() {
           } else {            
           }*/
         }
-        //alert( 'You clicked on '+data[0]+'\'s row' ); xxxxxxxxx
       });
       $("#dtFirebase tr").css("cursor", "pointer");
     });
-    //console.log('reset arrData');
-    //arrData = new Array();
 }
 
 function Users() {
   var arrData = new Array();
   var iLoop = 0;
   var tmpObj;
+
+  DatatableSec.style.display = "block";
+
   firebase.firestore().collection("users").orderBy("dateCreated", "asc").onSnapshot(snaps => {
       snaps.forEach(doc => {
         arrData[iLoop] = new Array(
@@ -345,9 +318,7 @@ function Users() {
           fbDataCheck(doc.data().icNo),
           firebaseTime(doc.data().dateCreated)
         );
-
         iLoop++;
-        //Search.style.display = "block";
       });
 
       tableFirebase = $("#dtFirebase").DataTable({
@@ -369,8 +340,7 @@ function Users() {
             visible: false,
             searchable: false
           }
-        ],
-        destroy: true
+        ]
       });
 
       $("#dtFirebase tbody").on("click", "tr", function() {
@@ -440,7 +410,6 @@ function firebaseTime(fbTime) {
 }
 
 function Import() {
-
   ImportSec.style.display = "block";
 }
 
