@@ -32,27 +32,25 @@
 <body>
   <div id="app">
     <section id="event-details-container">
-      <img
-        src="https://ppas-celex.firebaseapp.com/images/ppas.png"
-        style="width:100px;height:60px;"
-      />
-      <div width="100%" align="right">
-        <button id="btnLogin">Login</button>
-      </div>
+      <table width="100%">
+        <tr>
+          <td width="20%"><img src="https://ppas-celex.firebaseapp.com/images/ppas.png" style="width:100px;height:60px;" /></td>
+          <td width="60%" align="center">
+            <section id="MenuSec" style="display:none;">
+              <div align="center">
+                <label id="btnLatest"><a href="?mode=latest">Latest Activities</a></label>
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <label id="btnLibCard"><a href="?mode=libcard">Library Cards</a></label>
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <label id="btnImport"><a href="?mode=import">Import Library Cards</a></label>
+              </div>
+            </section>
+            </td>
+          <td width="20%" align="right"><button id="btnLogin">Login</button></td>
+        </tr>
+      </table>
     </section>
-
-    <section id="MenuSec" style="display:none;">
-      <div align="center">
-        <label id="btnLatest"><a href="?mode=latest">Latest Activities</a></label>
-        &nbsp;&nbsp;|&nbsp;&nbsp;
-        <label id="btnLibCard"><a href="?mode=libcard">Library Cards</a></label>
-        &nbsp;&nbsp;|&nbsp;&nbsp;
-        <label id="btnImport"><a href="?mode=import">Import Library Cards</a></label>
-      </div>
-    </section>
-
     <hr />
-
     <section id="firebaseui-auth-container"></section>
 
     <section id="WelcomeSec" style="font-size:16px; display:none">

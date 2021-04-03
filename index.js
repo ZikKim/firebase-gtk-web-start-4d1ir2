@@ -55,7 +55,7 @@ async function main() {
   // Listen to the current Auth state
   firebase.auth().onAuthStateChanged(user => {
     if (user) {
-      console.log(user.email);      
+      //console.log(user.email);
       firebase.firestore().collection("permit").where( "identifier", "==", user.email ).get().then(snapshot => {
         if(snapshot.size) {
           btnLogin.textContent = "Log Out";
@@ -68,6 +68,7 @@ async function main() {
       MenuSec.style.display = "none";
       DatatableSec.style.display = "none";
       ImportSec.style.display = "none";
+      WelcomeSec.style.display = "block";
     }
   });
 
@@ -229,12 +230,12 @@ function ModeSelection() {
   }
 }
 
-function findGetParameter(parameterName) {
+function findGetParameter(param) {
   var result = null,
     tmp = [];
   location.search.substr(1).split("&").forEach(function(item) {
       tmp = item.split("=");
-      if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+      if (tmp[0] === param) result = decodeURIComponent(tmp[1]);
     });
   return result;
 }
